@@ -11,7 +11,7 @@ Motivation is to build a complete DIY autonomy software from scratch (motion pla
 
 ##### _Linux_
 ```bash
-$ [sudo] apt-get install *TODO*
+$ [sudo] apt-get install libudev-dev pkg-config
 ```
 ##### _MacOs_
 ```bash
