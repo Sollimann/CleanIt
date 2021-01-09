@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+    "drivers",
+    "core",
+    "api",
+    "visualization"
+]
