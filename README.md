@@ -22,3 +22,42 @@ $ brew install *TODO*
  - iRobot Create 2 (or iRobot Roomba 6xx series with serial USB cable - https://store.irobot.com/en_US/parts-and-accessories/create-accessories/communication-cable-for-create-2/4466502.html )
  - Raspberry Pi 4 (4GB)
  - Intel RealSense D435 or D435i depth camera
+ 
+ ## Structure
+ 
+ #### project
+ ```bash
+ ├── Cargo.toml
+ ├── Cargo.lock
+ ├── api (bin)
+ ├── core (bin)
+ │   ├── src
+ |       └── roomba
+ |       └── realsense
+ |       └── rplidar
+ ├── drivers (lib)
+ │   ├── src
+ |       └── roomba
+ |       └── realsense
+ |       └── rplidar
+ │   ├── 
+ └── visualization (bin)
+     └── simple_example.rs
+ ```
+ 
+#### crate/package
+```bash
+├── Cargo.toml
+├── Cargo.lock
+├── src
+│   ├── main.rs
+│   ├── lib.rs
+│   └── bin
+│       └── another_executable.rs
+├── tests
+│   └── some_integration_tests.rs
+├── benches
+│   └── simple_bench.rs
+└── examples
+    └── simple_example.rs
+```
