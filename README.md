@@ -54,10 +54,18 @@ Motivation is to build a complete DIY autonomy software from scratch (motion pla
 
 ### *Software*
 
-##### _Linux_
+#### _Linux_
 ```bash
 $ [sudo] apt-get install libudev-dev pkg-config
 ```
+
+User serial permission is required to connect to Create over serial. You can add your user to the dialout group to get permission:
+
+```bash
+$ [sudo] usermod -a -G dialout $USER
+```
+
+Logout and login again for this to take effect.
 ##### _MacOs_
 ```bash
 $ brew install *TODO*

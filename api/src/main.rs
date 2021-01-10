@@ -1,12 +1,7 @@
 use drivers;
 
-use drivers::add_one;
+use drivers::roomba::reading;
 
 fn main() {
-    let num = 10;
-    println!(
-        "Hello, world! {} plus one is {}!",
-        num,
-        add_one(num)
-    );
+    reading::open_and_configure_port();
 }
