@@ -12,25 +12,25 @@ Motivation is to build a complete DIY autonomy software from scratch (motion pla
  ├── Cargo.toml (workspace)
  ├── Cargo.lock
  ├── api (bin)
- |      └── server
+ |   └── server
  ├── core (bin)
- |      └── mission
- |      └── motion
- |      └── slam
- |      └── perception
- |      └── risk
+ |   └── mission
+ |   └── motion
+ |   └── slam
+ |   └── perception
+ |   └── risk
  ├── drivers (lib)
- |      └── roomba
- |      └── realsense
- |      └── rplidar
- |      └── raspberryPi
+ |   └── roomba
+ |   └── realsense
+ |   └── rplidar
+ |   └── raspberryPi
  └── proto
- |      └── state.proto
- |      └── map2D.proto
+ |   └── state.proto
+ |   └── map2D.proto
  └── visualization (bin)
- |      └── urdf
- |      └── map
- |      └── camera
+ |   └── urdf
+ |   └── map
+ |   └── camera
  ```
  
 #### Crate/package Layout
