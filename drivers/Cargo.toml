@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 serialport = "4.0.0"
+byteorder = "1.4.2"

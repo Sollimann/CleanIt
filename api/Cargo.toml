@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 drivers = { path = "../drivers"}
+byteorder = "1.4.2"
