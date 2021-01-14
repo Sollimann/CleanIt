@@ -30,13 +30,16 @@ pub fn duplex() {
     // send out 4 bytes every 15 ms
     thread::spawn(move || loop {
         clone
-            .write_all(&[142, 24])
+            .write_all(&[142, 100])
             .expect("Failed to write to serial port");
         thread::sleep(Duration::from_millis(15))
     });
+    // clone
+    //     .write_all(&[142, 23])
+    //     .expect("Failed to write to serial port");
 
     // Read the response from the cloned port
-    let mut buffer = [0u8; 10];
+    let mut buffer = [0u8; 80];
     let mut _count = 1;
     loop {
         match port.read(&mut buffer) {
@@ -46,7 +49,8 @@ pub fn duplex() {
                 println!("count: {}", _count);
                 println!("buffer size: {} bytes", bytes_recvd);
                 println!("buffer content: {:?}", &buffer);
-                let value1 = byteorder::BigEndian::read_i16(&buffer);
+                println!("packet 58: {:?}", &buffer[79..]);
+                let value1 = byteorder::BigEndian::read_i16(&buffer[79..]);
                 println!("buffer decode: {}", value1);
             }
             Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
