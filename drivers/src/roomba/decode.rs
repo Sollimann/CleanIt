@@ -5,6 +5,8 @@ const HEX_PREFIX: &str = "0x";
 
 /// Decode a 16 bit short from two bytes
 ///
+/// Example: (high: 255, low: 56) -> [255] [56] -> 0xFF38 = -200
+///
 /// Arguments:
 ///     low: The low byte of the 2's complement. This is specified first to make it
 ///          easier when popping
