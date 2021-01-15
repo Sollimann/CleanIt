@@ -9,3 +9,5 @@ edition = "2018"
 [dependencies]
 serialport = "4.0.0"
 byteorder = "1.4.2"
+hex = "0.4.2"
+parse_int = "0.5.0"
