@@ -1,7 +1,53 @@
+use bitreader::BitReader;
 use hex::encode;
 use parse_int::parse;
+use std::collections::HashMap;
 
 const HEX_PREFIX: &str = "0x";
+
+/// gets the bit at position `n`. Bits are numbered from 0 (least significant) to 31 (most significant).
+fn get_bit_at(input_byte: u8, bit_pos: u8) -> Result<u8, (&'static str, u8)> {
+    if bit_pos < 8 {
+        Ok(input_byte & (1 << bit_pos))
+    } else {
+        Err(("bit position {} not valid", bit_pos))
+    }
+}
+
+/// Read specific bits from a byte
+///
+/// Example:
+///
+/// Arguments:
+///     byte: The byte to be decoded
+///
+/// Returns: A dict
+pub fn decode_individual_bits(byte: u8) {
+    let bit0: u8 = get_bit_at(byte, 0_u8).unwrap();
+    let bit1: u8 = get_bit_at(byte, 1_u8).unwrap();
+    let bit2: u8 = get_bit_at(byte, 2_u8).unwrap();
+    let bit3: u8 = get_bit_at(byte, 3_u8).unwrap();
+    let bit4: u8 = get_bit_at(byte, 4_u8).unwrap();
+    let bit5: u8 = get_bit_at(byte, 5_u8).unwrap();
+    let bit6: u8 = get_bit_at(byte, 6_u8).unwrap();
+    let bit7: u8 = get_bit_at(byte, 7_u8).unwrap();
+    let mut bits = HashMap::new();
+
+    println!(
+        "bit0: {}, bit1: {}, bit2: {}, bit3: {}, bit4: {}, bit5: {}, bit6: {}, bit7: {}",
+        bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7
+    );
+
+    bits.insert("bit0", bit0);
+    bits.insert("bit1", bit1);
+    bits.insert("bit2", bit2);
+    bits.insert("bit3", bit3);
+    bits.insert("bit4", bit4);
+    bits.insert("bit5", bit5);
+    bits.insert("bit6", bit6);
+    bits.insert("bit7", bit7);
+    println!("bits: {:?}", bits);
+}
 
 /// Decode an unsigned byte. Basically return the input
 ///
@@ -70,12 +116,68 @@ pub fn decode_short(high: u8, low: u8) -> i16 {
 ///
 /// Returns: True or False
 pub fn decode_bool(byte: u8) -> bool {
-    let one_byte_buffer = [byte];
-    let encoded_hex = encode(one_byte_buffer);
-    let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
-    let decoded_decimal = parse::<u8>(&prefixed_hex);
-    let value = decoded_decimal.unwrap() as u8;
-    value != 0
+    // let one_byte_buffer = [byte];
+    // let encoded_hex = encode(one_byte_buffer);
+    // let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
+    // let decoded_decimal = parse::<u8>(&prefixed_hex);
+    // let value = decoded_decimal.unwrap() as u8;
+    byte != 0
+}
+
+/// Decode Packet 46 (Light Bump Left Signal) and return its value
+///
+/// The strength of the light bump left signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-4095
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
+pub fn decode_packet_46(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 47 (Light Bump Front Left Signal) and return its value
+///
+/// The strength of the light bump front left signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-4095
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
+pub fn decode_packet_47(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 48 (Light Bump Center Left Signal) and return its value
+///
+/// The strength of the light bump center left signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-4095
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
+pub fn decode_packet_48(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 49 (Light Bump Center Right Signal) and return its value
+///
+/// The strength of the light bump center right signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-4095
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
+pub fn decode_packet_49(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
 }
 
 /// Decode Packet 50 (Light Bump Front Right Signal) and return its value

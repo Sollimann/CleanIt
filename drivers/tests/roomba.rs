@@ -1,7 +1,9 @@
 extern crate drivers;
 
 use drivers::roomba;
-use drivers::roomba::decode::{decode_bool, decode_short, decode_unsigned_short};
+use drivers::roomba::decode::{
+    decode_bool, decode_individual_bits, decode_short, decode_unsigned_short,
+};
 
 #[test]
 fn list_available_ports_test() {
@@ -11,6 +13,11 @@ fn list_available_ports_test() {
 #[test]
 fn read_from_port() {
     roomba::reading::open_and_configure_port()
+}
+
+#[test]
+fn decode_individual_bits_of_byte() {
+    decode_individual_bits(46);
 }
 
 #[test]
@@ -29,7 +36,7 @@ fn decode_two_bytes_as_unsigned_16_bit() {
 
 #[test]
 fn decode_one_bytes_as_boolean() {
-    let byte_array = [1];
+    let byte_array = [6];
     let value = decode_bool(byte_array[0]);
     assert_eq!(value, true);
 }
