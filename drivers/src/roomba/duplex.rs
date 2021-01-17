@@ -17,10 +17,10 @@ pub fn duplex() {
 
     // Write a buffer into this writer, returning how many bytes were written.
     // https://doc.rust-lang.org/nightly/std/io/trait.Write.html
-    let mut msg = port.write(&[FULL]);
+    let mut msg = port.write(&[START]);
     println!("{:?}", msg);
     thread::sleep(Duration::from_millis(15));
-    msg = port.write(&[START]);
+    msg = port.write(&[FULL]);
     println!("{:?}", msg);
     thread::sleep(Duration::from_millis(15));
 

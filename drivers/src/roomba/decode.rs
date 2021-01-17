@@ -3,7 +3,46 @@ use parse_int::parse;
 
 const HEX_PREFIX: &str = "0x";
 
-/// Decode a 16 bit short from two bytes
+/// Decode an unsigned byte. Basically return the input
+///
+/// Example:
+///
+/// Arguments:
+///     byte: The byte to be decoded
+///
+/// Returns: An unsigned int in range 0-255
+pub fn decode_unsigned_byte(byte: u8) -> u8 {
+    byte
+}
+
+/// Decode a unsigned 16 bit short from two bytes
+///
+/// A 16-bit integer can store 2^16 (or 65,536) distinct values. In an unsigned representation,
+/// these values are the integers between 0 and 65,535; using two's complement, possible values
+/// range from −32,768 to 32,767. Hence, a processor with 16-bit memory addresses can directly
+/// access 64 KB of byte-addressable memory.
+///
+/// Example: (high: 255, low: 56) -> [255] [56] -> 0xFF38 = 65336
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement. This is specified first to make it
+///          easier when popping
+///
+/// Returns: 16-bit signed value using two’s complement
+pub fn decode_unsigned_short(high: u8, low: u8) -> u16 {
+    let two_byte_buffer = [high, low];
+    let encoded_hex = encode(two_byte_buffer);
+    let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
+    parse::<u16>(&prefixed_hex).unwrap()
+}
+
+/// Decode a signed 16 bit short from two bytes
+///
+/// A 16-bit integer can store 2^16 (or 65,536) distinct values. In an unsigned representation,
+/// these values are the integers between 0 and 65,535; using two's complement, possible values
+/// range from −32,768 to 32,767. Hence, a processor with 16-bit memory addresses can directly
+/// access 64 KB of byte-addressable memory.
 ///
 /// Example: (high: 255, low: 56) -> [255] [56] -> 0xFF38 = -200
 ///
@@ -18,6 +57,7 @@ pub fn decode_short(high: u8, low: u8) -> i16 {
     let encoded_hex = encode(two_byte_buffer);
     let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
     let decoded_decimal = parse::<u16>(&prefixed_hex);
+    println!("decoded dec: {:?}", decoded_decimal);
     decoded_decimal.unwrap() as i16
 }
 
@@ -38,12 +78,110 @@ pub fn decode_bool(byte: u8) -> bool {
     value != 0
 }
 
-/// Decode Packet 57 (Side Brush Motor Current) and return its value
+/// Decode Packet 50 (Light Bump Front Right Signal) and return its value
+///
+/// The strength of the light bump front right signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-4095
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
+pub fn decode_packet_50(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 51 (Light Bump Right Signal) and return its value
+///
+/// The strength of the light bump right signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-4095
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
+pub fn decode_packet_51(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 52 (infrared char left) and return its value
+///
+/// This value identifies the 8-bit IR character currently being received by Roomba’s right receiver. A value of
+/// 0 indicates that no character is being received. These characters include those sent by the Roomba
+/// Remote, Dock, Virtual Walls, Create robots using the Send-IR command, and user-created devices.
+/// Range: 0 – 255
+///
+/// Arguments:
+///     data: The bytes to decode
+///
+/// Returns: unsigned Byte (0-255)
+pub fn decode_packet_52(byte: u8) -> u8 {
+    decode_unsigned_byte(byte)
+}
+
+/// Decode Packet 53 (infrared char right) and return its value
+///
+/// This value identifies the 8-bit IR character currently being received by Roomba’s right receiver. A value of
+/// 0 indicates that no character is being received. These characters include those sent by the Roomba
+/// Remote, Dock, Virtual Walls, Create robots using the Send-IR command, and user-created devices.
+/// Range: 0 – 255
+///
+/// Arguments:
+///     data: The bytes to decode
+///
+/// Returns: unsigned Byte (0-255)
+pub fn decode_packet_53(byte: u8) -> u8 {
+    decode_unsigned_byte(byte)
+}
+
+/// Decode Packet 54 (Left Motor Current) and return its value
 ///
 /// This returns the current being drawn by the side brush motor as an unsigned 16 bit value, high byte first.
 /// Range: -32768 – 32767 mA
 ///
-/// Example:
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: signed 16bit short. Strength of side brush motor current from -32768 - 32767 mA
+pub fn decode_packet_54(high: u8, low: u8) -> i16 {
+    decode_short(high, low)
+}
+
+/// Decode Packet 55 (Right Motor Current) and return its value
+///
+/// This returns the current being drawn by the side brush motor as an unsigned 16 bit value, high byte first.
+/// Range: -32768 – 32767 mA
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: signed 16bit short. Strength of side brush motor current from -32768 - 32767 mA
+pub fn decode_packet_55(high: u8, low: u8) -> i16 {
+    decode_short(high, low)
+}
+
+/// Decode Packet 56 (Main Brush Motor Current) and return its value
+///
+/// This returns the current being drawn by the side brush motor as an unsigned 16 bit value, high byte first.
+/// Range: -32768 – 32767 mA
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: signed 16bit short. Strength of side brush motor current from -32768 - 32767 mA
+pub fn decode_packet_56(high: u8, low: u8) -> i16 {
+    decode_short(high, low)
+}
+
+/// Decode Packet 57 (Side Brush Motor Current) and return its value
+///
+/// This returns the current being drawn by the side brush motor as an unsigned 16 bit value, high byte first.
+/// Range: -32768 – 32767 mA
 ///
 /// Arguments:
 ///     high: The high byte of the 2's complement
@@ -61,8 +199,6 @@ pub fn decode_packet_57(high: u8, low: u8) -> i16 {
 /// dirty to be read, a value of 2 is returned. If this happens, remove the stasis wheel and clean it with a
 /// damp cloth, then dry it thoroughly before reinstalling the wheel.
 /// Range: 0 – 3
-///
-/// Example:
 ///
 /// Arguments:
 ///     byte: The byte to decode
