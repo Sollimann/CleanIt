@@ -126,16 +126,48 @@ pub fn decode_bool(byte: u8) -> bool {
     byte != 0
 }
 
-/// Decode Packet 44 (Right Encoder Counts) and return its value
+/// Decode Packet 43 (Left Encoder Counts) and return its value
 ///
-/// The strength of the light bump left signal is returned as an unsigned 16-bit value, high byte first.
-/// Range: 0-4095
+/// The cumulative number of raw left encoder counts is returned as a signed 16-bit number, high byte first.
+/// This number will roll over if it passes the max value (at approx. 14.5 meters).
+/// Range: -32768 - 32767 counts
+///
+/// To convert counts to distance, simply do a unit conversion using the equation for circle circumference.
+/// N counts * (mm in 1 wheel revolution / counts in 1 wheel revolution) = mm
+/// N counts * (π * 72.0 / 508.8) = mm
 ///
 /// Arguments:
 ///     high: The high byte of the 2's complement
 ///     low: The low byte of the 2's complement
 ///
-/// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
+/// NOTE! This actually returns a signed 16 bit in range -32768 - 32767 counts, but for ease of use
+///       it is better to convert it to a unsigned 16 bit in range 0 - 65535 counts.
+///
+/// Returns: unsigned 16bit short. Cumulative number of raw right encoder counts. Rolls over
+//           to 0 after it passes 65535
+pub fn decode_packet_43(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 44 (Right Encoder Counts) and return its value
+///
+/// The cumulative number of raw right encoder counts is returned as a signed 16-bit number, high byte
+/// first. This number will roll over if it passes the max value (at approx. 14.5 meters).
+/// Range: -32768 - 32767 counts
+///
+/// To convert counts to distance, simply do a unit conversion using the equation for circle circumference.
+/// N counts * (mm in 1 wheel revolution / counts in 1 wheel revolution) = mm
+/// N counts * (π * 72.0 / 508.8) = mm
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// NOTE! This actually returns a signed 16 bit in range -32768 - 32767 counts, but for ease of use
+///       it is better to convert it to a unsigned 16 bit in range 0 - 65535 counts.
+///
+/// Returns: unsigned 16bit short. Cumulative number of raw right encoder counts. Rolls over
+///          to 0 after it passes 65535
 pub fn decode_packet_44(high: u8, low: u8) -> u16 {
     decode_unsigned_short(high, low)
 }

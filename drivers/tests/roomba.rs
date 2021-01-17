@@ -15,6 +15,8 @@ fn read_from_port() {
     roomba::reading::open_and_configure_port()
 }
 
+// Test decode util functions
+
 #[test]
 fn decode_individual_bits_of_byte() {
     let bits = decode_individual_bits(46);
@@ -43,8 +45,10 @@ fn decode_one_bytes_as_boolean() {
     assert_eq!(value, true);
 }
 
+// Test decode packages
+
 #[test]
-fn decode_statis_package_58() {
+fn decode_stasis_package_58() {
     let byte = 123;
     let hashmap = decode_packet_58(byte);
     println!("hashmap: {:?}", hashmap);
