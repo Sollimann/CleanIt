@@ -6,11 +6,15 @@ use std::collections::HashMap;
 const HEX_PREFIX: &str = "0x";
 
 /// gets the bit at position `n`. Bits are numbered from 0 (least significant) to 31 (most significant).
-fn get_bit_at(input_byte: u8, bit_pos: u8) -> Result<u8, (&'static str, u8)> {
+fn get_bit_at(input_byte: u8, bit_pos: u8) -> Result<u8, String> {
     if bit_pos < 8 {
         Ok(input_byte & (1 << bit_pos))
     } else {
-        Err(("bit position {} not valid", bit_pos))
+        let msg = format!(
+            "bit position {} not valid. Valid range is 0 << bit_pos << 7",
+            bit_pos
+        );
+        Err(msg)
     }
 }
 
@@ -30,7 +34,7 @@ pub fn decode_individual_bits(byte: u8) {
     let bit4: u8 = get_bit_at(byte, 4_u8).unwrap();
     let bit5: u8 = get_bit_at(byte, 5_u8).unwrap();
     let bit6: u8 = get_bit_at(byte, 6_u8).unwrap();
-    let bit7: u8 = get_bit_at(byte, 7_u8).unwrap();
+    let bit7: u8 = get_bit_at(byte, 8_u8).unwrap();
     let mut bits = HashMap::new();
 
     println!(
