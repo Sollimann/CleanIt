@@ -1,11 +1,20 @@
-use bitreader::BitReader;
-use hex::encode;
+use hex::{decode, encode};
 use parse_int::parse;
+use std::borrow::Borrow;
+use std::collections::hash_map::RandomState;
 use std::collections::HashMap;
 
 const HEX_PREFIX: &str = "0x";
 
 /// gets the bit at position `n`. Bits are numbered from 0 (least significant) to 31 (most significant).
+///
+/// Example: get_bit_at(46, 1).unwrap() -> 2
+///
+/// Arguments:
+///     input_byte: unsigned 8 bit byte to be deocded
+///     bit_pos: bit position to be read
+///
+/// Returns: A specific bit value of a byte
 fn get_bit_at(input_byte: u8, bit_pos: u8) -> Result<u8, String> {
     if bit_pos < 8 {
         Ok(input_byte & (1 << bit_pos))
@@ -26,31 +35,25 @@ fn get_bit_at(input_byte: u8, bit_pos: u8) -> Result<u8, String> {
 ///     byte: The byte to be decoded
 ///
 /// Returns: A dict
-pub fn decode_individual_bits(byte: u8) {
-    let bit0: u8 = get_bit_at(byte, 0_u8).unwrap();
-    let bit1: u8 = get_bit_at(byte, 1_u8).unwrap();
-    let bit2: u8 = get_bit_at(byte, 2_u8).unwrap();
-    let bit3: u8 = get_bit_at(byte, 3_u8).unwrap();
-    let bit4: u8 = get_bit_at(byte, 4_u8).unwrap();
-    let bit5: u8 = get_bit_at(byte, 5_u8).unwrap();
-    let bit6: u8 = get_bit_at(byte, 6_u8).unwrap();
-    let bit7: u8 = get_bit_at(byte, 8_u8).unwrap();
+pub fn decode_individual_bits<'a>(byte: u8) -> HashMap<&'a str, u8, RandomState> {
     let mut bits = HashMap::new();
-
-    println!(
-        "bit0: {}, bit1: {}, bit2: {}, bit3: {}, bit4: {}, bit5: {}, bit6: {}, bit7: {}",
-        bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7
-    );
-
+    let bit0: u8 = get_bit_at(byte, 0_u8).unwrap();
     bits.insert("bit0", bit0);
+    let bit1: u8 = get_bit_at(byte, 1_u8).unwrap();
     bits.insert("bit1", bit1);
+    let bit2: u8 = get_bit_at(byte, 2_u8).unwrap();
     bits.insert("bit2", bit2);
+    let bit3: u8 = get_bit_at(byte, 3_u8).unwrap();
     bits.insert("bit3", bit3);
+    let bit4: u8 = get_bit_at(byte, 4_u8).unwrap();
     bits.insert("bit4", bit4);
+    let bit5: u8 = get_bit_at(byte, 5_u8).unwrap();
     bits.insert("bit5", bit5);
+    let bit6: u8 = get_bit_at(byte, 6_u8).unwrap();
     bits.insert("bit6", bit6);
+    let bit7: u8 = get_bit_at(byte, 7_u8).unwrap();
     bits.insert("bit7", bit7);
-    println!("bits: {:?}", bits);
+    bits
 }
 
 /// Decode an unsigned byte. Basically return the input
@@ -120,12 +123,33 @@ pub fn decode_short(high: u8, low: u8) -> i16 {
 ///
 /// Returns: True or False
 pub fn decode_bool(byte: u8) -> bool {
-    // let one_byte_buffer = [byte];
-    // let encoded_hex = encode(one_byte_buffer);
-    // let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
-    // let decoded_decimal = parse::<u8>(&prefixed_hex);
-    // let value = decoded_decimal.unwrap() as u8;
     byte != 0
+}
+
+/// Decode Packet 44 (Right Encoder Counts) and return its value
+///
+/// The strength of the light bump left signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-4095
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
+pub fn decode_packet_44(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 45 (infrared char left) and return its value
+///
+/// The light bumper detections are returned as individual bits.
+///
+/// Arguments:
+///     byte: The bytes to decode
+///
+/// Returns: A HashMapof 'light bumper'
+pub fn decode_packet_45(byte: u8) -> HashMap<&'static str, u8, RandomState> {
+    decode_individual_bits(byte)
 }
 
 /// Decode Packet 46 (Light Bump Left Signal) and return its value
@@ -309,7 +333,13 @@ pub fn decode_packet_57(high: u8, low: u8) -> i16 {
 /// Arguments:
 ///     byte: The byte to decode
 ///
-/// Returns: True if robot is making forward progress, else False
-pub fn decode_packet_58(byte: u8) -> bool {
-    decode_bool(byte)
+/// Returns: HashMap of "stasis disabled" and "stasis toggling"
+pub fn decode_packet_58(byte: u8) -> HashMap<String, u8, RandomState> {
+    let mut stasis: HashMap<String, u8> = HashMap::new();
+    let bits = decode_individual_bits(byte);
+    let disabled = bits.get("bit1").unwrap();
+    let toggling = bits.get("bit0").unwrap();
+    stasis.insert("disabled".to_string(), *disabled);
+    stasis.insert("toggling".to_string(), *toggling);
+    stasis
 }
