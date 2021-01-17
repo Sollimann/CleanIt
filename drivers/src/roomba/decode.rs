@@ -6,12 +6,12 @@ use std::collections::HashMap;
 
 const HEX_PREFIX: &str = "0x";
 
-/// gets the bit at position `n`. Bits are numbered from 0 (least significant) to 31 (most significant).
+/// gets the bit at position `n`. Bits are numbered from 0 (least significant) to 7 (most significant).
 ///
 /// Example: get_bit_at(46, 1).unwrap() -> 2
 ///
 /// Arguments:
-///     input_byte: unsigned 8 bit byte to be deocded
+///     input_byte: unsigned 8 bit byte to be decoded
 ///     bit_pos: bit position to be read
 ///
 /// Returns: A specific bit value of a byte
@@ -110,7 +110,6 @@ pub fn decode_short(high: u8, low: u8) -> i16 {
     let encoded_hex = encode(two_byte_buffer);
     let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
     let decoded_decimal = parse::<u16>(&prefixed_hex);
-    println!("decoded dec: {:?}", decoded_decimal);
     decoded_decimal.unwrap() as i16
 }
 
@@ -126,10 +125,116 @@ pub fn decode_bool(byte: u8) -> bool {
     byte != 0
 }
 
+/// Decode Packet 36 (Song number) and return its value
+///
+/// The currently selected OI song is returned.
+/// Range: 0-15
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: unsigned byte, the current song id playing (0-15)
+pub fn decode_packet_36(byte: u8) -> u8 {
+    decode_unsigned_byte(byte)
+}
+
+/// Decode Packet 37 (Song playing) and return its value
+///
+/// The state of the OI song player is returned. 1 = OI song currently playing; 0 = OI song not playing.
+/// Range: 0-1
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: True or False, stating whether the song is playing
+pub fn decode_packet_37(byte: u8) -> bool {
+    decode_bool(byte)
+}
+
+/// Decode Packet 38 (Number of stream packets) and return its value
+///
+/// The number of data stream packets is returned.
+/// Range: 0-108
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: unsigned 8bit short; the number of data stream packets
+pub fn decode_packet_38(byte: u8) -> u8 {
+    decode_unsigned_byte(byte)
+}
+
+/// Decode Packet 39 (requested velocity) and return its value
+///
+/// The velocity most recently requested with a Drive command is returned as a signed 16-bit number,
+/// high byte first.
+/// Range: -500 - 500 mm/s
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: signed 16bit short. Velocity most recently requested by Drive()
+pub fn decode_packet_39(high: u8, low: u8) -> i16 {
+    decode_short(high, low)
+}
+
+/// Decode Packet 40 (requested radius) and return its value
+///
+/// The radius most recently requested with a Drive command is returned as a signed 16-bit number, high
+/// byte first. The radius is measured from the center of the turning circle to the center of Roomba.
+/// A Drive command with a positive velocity and a positive radius makes Roomba drive forward while
+/// turning toward the left. A negative radius makes Roomba turn toward the right.
+/// Range: -32768 - 32767 mm
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// NOTE: Create 2 and Roomba 500/600 firmware versions prior to 3.3.0 return an incorrect value for
+/// sensors measured in millimeters. To determine the firmware version on your robot, send a 7 via the serial
+/// port to reset it. The robot will print a long welcome message which will include the firmware version, for
+/// example: r3_robot/tags/release-3.3.0.
+///
+/// Returns: signed 16bit short. Radius most recently requested by Drive()
+pub fn decode_packet_40(high: u8, low: u8) -> i16 {
+    decode_short(high, low)
+}
+
+/// Decode Packet 41 (Requested right velocity) and return its value
+///
+/// The right wheel velocity most recently requested with a Drive Direct command is returned as a signed 16-
+/// bit number, high byte first.
+/// Range: -500 - 500 mm/s
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: signed 16bit short. right wheel velocity recently requested by DriveDirect()
+pub fn decode_packet_41(high: u8, low: u8) -> i16 {
+    decode_short(high, low)
+}
+
+/// Decode Packet 42 (Requested left velocity) and return its value
+///
+/// The left wheel velocity most recently requested with a Drive Direct command is returned as a signed 16-
+/// bit number, high byte first.
+/// Range: -500 - 500 mm/s
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: signed 16bit short. Left wheel velocity recently requested by DriveDirect()
+pub fn decode_packet_42(high: u8, low: u8) -> i16 {
+    decode_short(high, low)
+}
+
 /// Decode Packet 43 (Left Encoder Counts) and return its value
 ///
 /// The cumulative number of raw left encoder counts is returned as a signed 16-bit number, high byte first.
-/// This number will roll over if it passes the max value (at approx. 14.5 meters).
+/// This number will roll over if it pas    ses the max value (at approx. 14.5 meters).
 /// Range: -32768 - 32767 counts
 ///
 /// To convert counts to distance, simply do a unit conversion using the equation for circle circumference.
