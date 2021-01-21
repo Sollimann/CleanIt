@@ -137,7 +137,121 @@ pub fn decode_bool(byte: u8) -> bool {
     byte != 0
 }
 
+/// Decode Packet 19 (distance) and return its value
+///
+/// The distance that Roomba has traveled in millimeters since the distance it was last requested is sent as a
+/// signed 16-bit value, high byte first. This is the same as the sum of the distance traveled by both wheels
+/// divided by two. Positive values indicate travel in the forward direction; negative values indicate travel in
+/// the reverse direction. If the value is not polled frequently enough, it is capped at its minimum or
+/// maximum.
+/// Range: -32768 – 32767
+///
+/// NOTE: Create 2 and Roomba 500/600 firmware versions prior to 3.3.0 return an incorrect value for
+/// sensors measured in millimeters. It is recommended that you read the left and right encoder counts
+/// directly (packets IDs 43 and 44) and do the unit conversion yourself.
+/// To determine the firmware version on your robot, send a 7 via the serial port to reset it. The robot will
+/// print a long welcome message which will include the firmware version, for example:
+/// r3_robot/tags/release-3.3.0.
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: signed 16 bit short. Represents difference between distance two wheels travelled
+pub fn decode_packet_19(high: u8, low: u8) -> i16 {
+    decode_short(high, low)
+}
+
+/// Decode Packet 20 (angle) and return its value
+///
+/// The angle in degrees that Roomba has turned since the angle was last requested is sent as a signed 16-
+/// bit value, high byte first. Counter-clockwise angles are positive and clockwise angles are negative. If the
+/// value is not polled frequently enough, it is capped at its minimum or maximum.
+/// Range: -32768 – 32767
+///
+/// NOTE: Create 2 and Roomba firmware versions 3.4.0 and earlier return an incorrect value for angle
+/// measured in degrees. The value returned must be divided by 0.324056 to get degrees. Or for more
+/// accurate results, you can read the left and right encoder counts directly (packet IDs 43 and 44) and
+/// calculate the angle yourself with this equation: angle in radians = (right wheel distance – left wheel
+/// distance) / wheel base distance.
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: signed 16 bit short. Represents difference between distance two wheels travelled
+pub fn decode_packet_20(high: u8, low: u8) -> i16 {
+    decode_short(high, low)
+}
+
+/// Decode Packet 21 (charging state) and return its value
+///
+/// This code indicates Roomba’s current charging state.
+/// Range: 0 – 5
+///
+/// 0 Not charging
+/// 1 Reconditioning Charging
+/// 2 Full Charging
+/// 3 Trickle Charging
+/// 4 Waiting
+/// 5 Charging Fault Condition
+///
+/// Arguments:
+///     data: The byte to decode
+///
+/// Returns: A value from 0-5, that describes the charging state
+pub fn decode_packet_21(byte: u8) -> u8 {
+    decode_unsigned_byte(byte)
+}
+
+/// Decode Packet 22 (voltage) and return its value
+///
+/// This code indicates the voltage of Roomba’s battery in millivolts (mV).
+/// Range: 0 – 65535 mV
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short, battery voltage in mV
+pub fn decode_packet_22(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 23 (current) and return its value
+///
+/// The current in milliamps (mA) flowing into or out of Roomba’s battery. Negative currents indicate that the
+/// current is flowing out of the battery, as during normal running. Positive currents indicate that the current
+/// is flowing into the battery, as during charging.
+/// Range: -32768 – 32767 mA
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: signed 16bit short. Positive currents is charging, negative is discharging
+pub fn decode_packet_23(high: u8, low: u8) -> i16 {
+    decode_short(high, low)
+}
+
+/// Decode Packet 24 (temperature) and return its value
+///
+/// The temperature of Roomba’s battery in degrees Celsius.
+/// Range: -128 – 127
+///
+/// Arguments:
+///     data: The byte to decode
+///
+/// Returns: unsigned 16bit short. Current charge of battery in milliAmp-hours
+pub fn decode_packet_24(byte: u8) -> i8 {
+    decode_byte(byte)
+}
+
 /// Decode Packet 25 (battery charge) and return its value
+///
+/// The current charge of Roomba’s battery in milliamp-hours (mAh). The charge value decreases as the
+/// battery is depleted during running and increases when the battery is charged.
+/// Range: 0 – 65535 mAh
 ///
 /// Arguments:
 ///     high: The high byte of the 2's complement
@@ -149,6 +263,9 @@ pub fn decode_packet_25(high: u8, low: u8) -> u16 {
 }
 
 /// Decode Packet 26 (battery capacity) and return its value
+///
+/// The estimated charge capacity of Roomba’s battery in milliamp-hours (mAh).
+/// Range: 0 – 65535 mAh
 ///
 /// Arguments:
 ///     high: The high byte of the 2's complement
