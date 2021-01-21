@@ -2,7 +2,8 @@ extern crate drivers;
 
 use drivers::roomba;
 use drivers::roomba::decode::{
-    decode_bool, decode_individual_bits, decode_packet_58, decode_short, decode_unsigned_short,
+    decode_bool, decode_byte, decode_individual_bits, decode_packet_58, decode_short,
+    decode_unsigned_byte, decode_unsigned_short,
 };
 
 #[test]
@@ -18,28 +19,42 @@ fn read_from_port() {
 // Test decode util functions
 
 #[test]
-fn decode_individual_bits_of_byte() {
+fn test_decode_individual_bits_of_byte() {
     let bits = decode_individual_bits(46);
     println!("{:?}", bits);
     assert_eq!(bits.len(), 8);
 }
 
 #[test]
-fn decode_two_bytes_as_signed_16_bit() {
+fn test_decode_unsigned_byte() {
+    let byte: u8 = 255;
+    let decoded: u8 = decode_unsigned_byte(byte);
+    assert_eq!(byte, decoded)
+}
+
+#[test]
+fn test_decode_byte() {
+    let byte: u8 = 255;
+    let decoded: i8 = decode_byte(byte);
+    assert_eq!(decoded, -1);
+}
+
+#[test]
+fn test_decode_two_bytes_as_signed_16_bit() {
     let byte_array = [255, 56];
-    let value = decode_short(byte_array[0], byte_array[1]);
+    let value: i16 = decode_short(byte_array[0], byte_array[1]);
     assert_eq!(value, -200);
 }
 
 #[test]
-fn decode_two_bytes_as_unsigned_16_bit() {
+fn test_decode_two_bytes_as_unsigned_16_bit() {
     let byte_array = [255, 56];
     let value = decode_unsigned_short(byte_array[0], byte_array[1]);
     assert_eq!(value, 65336);
 }
 
 #[test]
-fn decode_one_bytes_as_boolean() {
+fn test_decode_one_bytes_as_boolean() {
     let byte_array = [6];
     let value = decode_bool(byte_array[0]);
     assert_eq!(value, true);
@@ -48,7 +63,7 @@ fn decode_one_bytes_as_boolean() {
 // Test decode packages
 
 #[test]
-fn decode_stasis_package_58() {
+fn test_decode_stasis_package_58() {
     let byte = 123;
     let hashmap = decode_packet_58(byte);
     println!("hashmap: {:?}", hashmap);

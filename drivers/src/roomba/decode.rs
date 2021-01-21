@@ -68,6 +68,18 @@ pub fn decode_unsigned_byte(byte: u8) -> u8 {
     byte
 }
 
+/// Decode a signed byte.
+///
+/// Example:
+///
+/// Arguments:
+///     byte: The byte to be decoded
+///
+/// Returns: An unsigned int in range 0-255
+pub fn decode_byte(byte: u8) -> i8 {
+    byte as i8
+}
+
 /// Decode a unsigned 16 bit short from two bytes
 ///
 /// A 16-bit integer can store 2^16 (or 65,536) distinct values. In an unsigned representation,
@@ -123,6 +135,100 @@ pub fn decode_short(high: u8, low: u8) -> i16 {
 /// Returns: True or False
 pub fn decode_bool(byte: u8) -> bool {
     byte != 0
+}
+
+/// Decode Packet 25 (battery charge) and return its value
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Current charge of battery in milliAmp-hours
+pub fn decode_packet_25(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 26 (battery capacity) and return its value
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Estimated charge capacity of battery in milliAmp-hours
+pub fn decode_packet_26(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 27 (wall signal) and return its value
+///
+/// The strength of the wall signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-1023
+/// NOTE: This packet is deprecated and only kept for backwards compatibility. It is recommended you use
+/// the “Light Bump Right Signal” (ID: 51) packet instead, which has a higher resolution.
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of wall signal from 0-1023
+pub fn decode_packet_27(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 28 (cliff left signal) and return its value
+///
+/// The strength of the cliff left signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-4095
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of cliff left signal from 0-4095
+pub fn decode_packet_28(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 29 (cliff front left signal) and return its value
+///
+/// The strength of the cliff front left signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-4095
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of cliff front left signal from 0-4095
+pub fn decode_packet_29(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 30 (cliff front right signal) and return its value
+///
+/// The strength of the cliff front right signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-4095
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of cliff front right signal from 0-4095
+pub fn decode_packet_30(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
+}
+
+/// Decode Packet 31 (cliff right signal) and return its value
+///
+/// The strength of the cliff right signal is returned as an unsigned 16-bit value, high byte first.
+/// Range: 0-4095
+///
+/// Arguments:
+///     high: The high byte of the 2's complement
+///     low: The low byte of the 2's complement
+///
+/// Returns: unsigned 16bit short. Strength of cliff right signal from 0-4095
+pub fn decode_packet_31(high: u8, low: u8) -> u16 {
+    decode_unsigned_short(high, low)
 }
 
 /// Decode Packet 33 (Unused) and return its value
