@@ -125,6 +125,59 @@ pub fn decode_bool(byte: u8) -> bool {
     byte != 0
 }
 
+/// Decode Packet 33 (Unused) and return its value
+///
+/// The current OI mode is returned. See table below.
+/// Range: 0-3
+///
+/// Arguments:
+///     low: The first byte to be ignored
+///     mid: The second byte to be ignored
+///     high: The third byte to be ignored
+///
+/// Returns: A unsigned byte, the current OI mode id from 0-3
+pub fn decode_packet_32_and_33(low: u8, mid: u8, high: u8) -> String {
+    format!(
+        "ignoring 3 consecutive bytes: {low}, {mid}, {high}",
+        low = low,
+        mid = mid,
+        high = high
+    )
+}
+
+/// Decode Packet 34 (charging sources available) and return its value
+///
+/// Roomba’s connection to the Home Base and Internal Charger are returned as individual bits, as below.
+/// Range: 0-3
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: HashMap of "home base" and "internal charger"
+///         1 = charging source present and powered; 0 = charging source not present or not powered.
+pub fn decode_packet_34(byte: u8) -> HashMap<String, u8, RandomState> {
+    let mut charging_sources_available: HashMap<String, u8> = HashMap::new();
+    let bits = decode_individual_bits(byte);
+    let home_base = bits.get("bit1").unwrap();
+    let internal_charger = bits.get("bit0").unwrap();
+    charging_sources_available.insert("home".to_string(), *home_base);
+    charging_sources_available.insert("internal".to_string(), *internal_charger);
+    charging_sources_available
+}
+
+/// Decode Packet 35 (OI Mode) and return its value
+///
+/// The current OI mode is returned. See table below.
+/// Range: 0-3
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: A unsigned byte, the current OI mode id from 0-3
+pub fn decode_packet_35(byte: u8) -> u8 {
+    decode_unsigned_byte(byte)
+}
+
 /// Decode Packet 36 (Song number) and return its value
 ///
 /// The currently selected OI song is returned.
