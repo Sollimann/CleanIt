@@ -137,6 +137,217 @@ pub fn decode_bool(byte: u8) -> bool {
     byte != 0
 }
 
+/// Decode Packet 14 (wheel overcurrents) and return its value
+///
+/// The state of the bumper (0 = no bump, 1 = bump) and wheel drop sensors (0 = wheel raised, 1 = wheel
+/// dropped) are sent as individual bits.
+/// Range: 0 – 15
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: HashMap of 'wheel overcurrents'
+pub fn decode_packet_7(byte: u8) -> HashMap<String, u8, RandomState> {
+    let mut bumps_and_wheel_drops: HashMap<String, u8> = HashMap::new();
+    let bits = decode_individual_bits(byte);
+    let bump_right = bits.get("bit0").unwrap();
+    let bump_left = bits.get("bit1").unwrap();
+    let wheel_drop_right = bits.get("bit2").unwrap();
+    let wheel_drop_left = bits.get("bit3").unwrap();
+    bumps_and_wheel_drops.insert("bump_right".to_string(), *bump_right);
+    bumps_and_wheel_drops.insert("bump_left".to_string(), *bump_left);
+    bumps_and_wheel_drops.insert("wheel_drop_right".to_string(), *wheel_drop_right);
+    bumps_and_wheel_drops.insert("wheel_drop_left".to_string(), *wheel_drop_left);
+    bumps_and_wheel_drops
+}
+
+/// Decode Packet 8 (wall seen) and return its value
+///
+/// The state of the wall sensor is sent as a 1 bit value (0 = no wall, 1 = wall seen).
+/// Range: 0 – 1
+/// NOTE: This packet is deprecated and only kept for backwards compatibility. It is recommended you use
+/// the “Light Bumper” (ID: 45) packet instead, which will show you all of the bumper wall signals.
+/// NOTE: This packet is a binary version of the “Wall Signal” (ID: 27) packet.
+/// NOTE: The wall sensor is equivalent to Light Bumper Right.
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: True if wall is detected, else False
+pub fn decode_packet_8(byte: u8) -> bool {
+    decode_bool(byte)
+}
+
+/// Decode Packet 9 (cliff left) and return its value
+///
+/// The state of the cliff sensor on the left side of Roomba is sent as a 1 bit value (0 = no cliff, 1 = cliff).
+/// Range: 0 – 1
+/// NOTE: This packet is a binary version of the “Cliff Left Signal” (ID: 28) packet.
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: True if cliff left is detected, else False
+pub fn decode_packet_9(byte: u8) -> bool {
+    decode_bool(byte)
+}
+
+/// Decode Packet 10 (cliff front left) and return its value
+///
+/// The state of the cliff sensor on the front left of Roomba is sent as a 1 bit value (0 = no cliff, 1 = cliff).
+/// Range: 0 – 1
+/// NOTE: This packet is a binary version of the “Cliff Front Left Signal” (ID: 29) packet.
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: True if cliff front left is detected, else False
+pub fn decode_packet_10(byte: u8) -> bool {
+    decode_bool(byte)
+}
+
+/// Decode Packet 11 (cliff front right) and return its value
+///
+/// The state of the cliff sensor on the front right of Roomba is sent as a 1 bit value (0 = no cliff, 1 = cliff)
+/// Range: 0 – 1
+/// NOTE: This packet is a binary version of the “Cliff Front Right Signal” (ID: 30) packet
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: True if right cliff is detected, else False
+pub fn decode_packet_11(byte: u8) -> bool {
+    decode_bool(byte)
+}
+
+/// Decode Packet 12 (cliff right) and return its value
+///
+/// The state of the cliff sensor on the right side of Roomba is sent as a 1 bit value (0 = no cliff, 1 = cliff)
+/// Range: 0 – 1
+/// NOTE: This packet is a binary version of the “Cliff Right Signal” (ID: 31) packet.
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: True if right cliff is detected, else False
+pub fn decode_packet_12(byte: u8) -> bool {
+    decode_bool(byte)
+}
+
+/// Decode Packet 13 (virtual wall) and return its value
+///
+/// The state of the virtual wall detector is sent as a 1 bit value (0 = no virtual wall detected, 1 = virtual wall
+/// detected).
+/// Range: 0 – 1
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: True if virtual wall detected, else False
+pub fn decode_packet_13(byte: u8) -> bool {
+    decode_bool(byte)
+}
+
+/// Decode Packet 14 (wheel overcurrents) and return its value
+///
+/// The state of the four wheel overcurrent sensors are sent as individual bits (0 = no overcurrent, 1 =
+/// overcurrent). There is no overcurrent sensor for the vacuum on Roomba 600.
+/// Range: 0 – 31
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: HashMap of 'wheel overcurrents'
+pub fn decode_packet_14(byte: u8) -> HashMap<String, u8, RandomState> {
+    let mut buttons: HashMap<String, u8> = HashMap::new();
+    let bits = decode_individual_bits(byte);
+    let side_brush = bits.get("bit0").unwrap();
+    let main_brush = bits.get("bit1").unwrap();
+    let right_wheel = bits.get("bit2").unwrap();
+    let left_wheel = bits.get("bit3").unwrap();
+    buttons.insert("side_brush".to_string(), *side_brush);
+    buttons.insert("main_brush".to_string(), *main_brush);
+    buttons.insert("right_wheel".to_string(), *right_wheel);
+    buttons.insert("left_wheel".to_string(), *left_wheel);
+    buttons
+}
+
+/// Decode Packet 15 (dirt detect) and return its value
+///
+/// The level of the dirt detect sensor.
+/// Range: 0-255
+///
+/// Arguments:
+///     byte: The byte to be ignored
+///
+/// Returns: unsigned Byte (0-255)
+pub fn decode_packet_15(byte: u8) -> String {
+    format!("ignoring byte: {byte}", byte = byte,)
+}
+
+/// Decode Packet 16 (unused byte) and return its value
+///
+/// Unused bytes: One unused byte is sent after the dirt detect byte when the requested packet is 0, 1, or 6.
+/// The value of the unused byte is always 0.
+/// Range: 0
+///
+/// Arguments:
+///     byte: The byte to be ignored
+///
+/// Returns: String
+pub fn decode_packet_16(byte: u8) -> String {
+    format!("ignoring byte: {byte}", byte = byte,)
+}
+
+/// Decode Packet 17 (infared char omni) and return its value
+///
+/// This value identifies the 8-bit IR character currently being received by Roomba’s omnidirectional receiver.
+/// A value of 0 indicates that no character is being received. These characters include those sent by the
+/// Roomba Remote, Dock, Virtual Walls, Create robots using the Send-IR command, and user-created
+/// devices.
+/// Range: 0 – 255
+///
+/// Arguments:
+///     data: The byte to decode
+///
+/// Returns: unsigned byte (0-255)
+pub fn decode_packet_17(byte: u8) -> u8 {
+    decode_unsigned_byte(byte)
+}
+
+/// Decode Packet 18 (buttons) and return its value
+///
+/// The state of the Roomba buttons are sent as individual bits (0 = button not pressed, 1 = button
+/// pressed). The day, hour, minute, clock, and scheduling buttons that exist only on Roomba 560 and 570
+/// will always return 0 on a Roomba 510 or 530 robot.
+/// Range: 0 – 255
+///
+/// Arguments:
+///     byte: The byte to decode
+///
+/// Returns: HashMap of 'buttons'
+pub fn decode_packet_18(byte: u8) -> HashMap<String, u8, RandomState> {
+    let mut buttons: HashMap<String, u8> = HashMap::new();
+    let bits = decode_individual_bits(byte);
+    let clean = bits.get("bit0").unwrap();
+    let spot = bits.get("bit1").unwrap();
+    let dock = bits.get("bit2").unwrap();
+    let minute = bits.get("bit3").unwrap();
+    let hour = bits.get("bit4").unwrap();
+    let day = bits.get("bit5").unwrap();
+    let schedule = bits.get("bit6").unwrap();
+    let clock = bits.get("bit7").unwrap();
+    buttons.insert("clean".to_string(), *clean);
+    buttons.insert("spot".to_string(), *spot);
+    buttons.insert("dock".to_string(), *dock);
+    buttons.insert("minute".to_string(), *minute);
+    buttons.insert("hour".to_string(), *hour);
+    buttons.insert("day".to_string(), *day);
+    buttons.insert("schedule".to_string(), *schedule);
+    buttons.insert("clock".to_string(), *clock);
+    buttons
+}
+
 /// Decode Packet 19 (distance) and return its value
 ///
 /// The distance that Roomba has traveled in millimeters since the distance it was last requested is sent as a
