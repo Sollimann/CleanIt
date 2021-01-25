@@ -62,7 +62,7 @@ pub fn duplex() {
     }
 }
 
-pub fn decode_sensor_packets(byte_data: Box<[u8]>) {
+pub fn decode_sensor_packets(byte_data: [u8; 80]) {
     #[derive(Debug)]
     enum Value {
         Str(String),
@@ -261,4 +261,8 @@ pub fn decode_sensor_packets(byte_data: Box<[u8]>) {
         "wheel drop and bumps",
         Value::HashMap(decode_packet_7(byte_data[0])),
     );
+
+    for (key, value) in &sensor_data {
+        println!("{}: {:?}", key, value);
+    }
 }
