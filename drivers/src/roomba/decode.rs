@@ -35,7 +35,7 @@ fn get_bit_at(input_byte: u8, bit_pos: u8) -> Result<u8, String> {
 ///     byte: The byte to be decoded
 ///
 /// Returns: A dict
-pub fn decode_individual_bits<'a>(byte: u8) -> HashMap<&'a str, u8, RandomState> {
+pub fn decode_individual_bits<'a>(byte: u8) -> HashMap<&'a str, u8> {
     let mut bits = HashMap::new();
     let bit0: u8 = get_bit_at(byte, 0_u8).unwrap();
     bits.insert("bit0", bit0);
@@ -147,7 +147,7 @@ pub fn decode_bool(byte: u8) -> bool {
 ///     byte: The byte to decode
 ///
 /// Returns: HashMap of 'wheel overcurrents'
-pub fn decode_packet_7(byte: u8) -> HashMap<String, u8, RandomState> {
+pub fn decode_packet_7(byte: u8) -> HashMap<String, u8> {
     let mut bumps_and_wheel_drops: HashMap<String, u8> = HashMap::new();
     let bits = decode_individual_bits(byte);
     let bump_right = bits.get("bit0").unwrap();
@@ -258,7 +258,7 @@ pub fn decode_packet_13(byte: u8) -> bool {
 ///     byte: The byte to decode
 ///
 /// Returns: HashMap of 'wheel overcurrents'
-pub fn decode_packet_14(byte: u8) -> HashMap<String, u8, RandomState> {
+pub fn decode_packet_14(byte: u8) -> HashMap<String, u8> {
     let mut buttons: HashMap<String, u8> = HashMap::new();
     let bits = decode_individual_bits(byte);
     let side_brush = bits.get("bit0").unwrap();
@@ -326,7 +326,7 @@ pub fn decode_packet_17(byte: u8) -> u8 {
 ///     byte: The byte to decode
 ///
 /// Returns: HashMap of 'buttons'
-pub fn decode_packet_18(byte: u8) -> HashMap<String, u8, RandomState> {
+pub fn decode_packet_18(byte: u8) -> HashMap<String, u8> {
     let mut buttons: HashMap<String, u8> = HashMap::new();
     let bits = decode_individual_bits(byte);
     let clean = bits.get("bit0").unwrap();
@@ -589,7 +589,7 @@ pub fn decode_packet_32_and_33(low: u8, mid: u8, high: u8) -> String {
 ///
 /// Returns: HashMap of "home base" and "internal charger"
 ///         1 = charging source present and powered; 0 = charging source not present or not powered.
-pub fn decode_packet_34(byte: u8) -> HashMap<String, u8, RandomState> {
+pub fn decode_packet_34(byte: u8) -> HashMap<String, u8> {
     let mut charging_sources_available: HashMap<String, u8> = HashMap::new();
     let bits = decode_individual_bits(byte);
     let home_base = bits.get("bit1").unwrap();
@@ -772,8 +772,22 @@ pub fn decode_packet_44(high: u8, low: u8) -> u16 {
 ///     byte: The bytes to decode
 ///
 /// Returns: A HashMapof 'light bumper'
-pub fn decode_packet_45(byte: u8) -> HashMap<&'static str, u8, RandomState> {
-    decode_individual_bits(byte)
+pub fn decode_packet_45(byte: u8) -> HashMap<String, u8> {
+    let mut light_bumper: HashMap<String, u8> = HashMap::new();
+    let bits = decode_individual_bits(byte);
+    let bumper_left = bits.get("bit0").unwrap();
+    let bumper_front_left = bits.get("bit1").unwrap();
+    let bumper_center_left = bits.get("bit2").unwrap();
+    let bumper_center_right = bits.get("bit3").unwrap();
+    let bumper_front_right = bits.get("bit4").unwrap();
+    let bumper_right = bits.get("bit5").unwrap();
+    light_bumper.insert("bumper_left".to_string(), *bumper_left);
+    light_bumper.insert("bumper_front_left".to_string(), *bumper_front_left);
+    light_bumper.insert("bumper_center_left".to_string(), *bumper_center_left);
+    light_bumper.insert("bumper_center_right".to_string(), *bumper_center_right);
+    light_bumper.insert(" bumper_front_right".to_string(), *bumper_front_right);
+    light_bumper.insert("bumper_right".to_string(), *bumper_right);
+    light_bumper
 }
 
 /// Decode Packet 46 (Light Bump Left Signal) and return its value
@@ -958,7 +972,7 @@ pub fn decode_packet_57(high: u8, low: u8) -> i16 {
 ///     byte: The byte to decode
 ///
 /// Returns: HashMap of "stasis disabled" and "stasis toggling"
-pub fn decode_packet_58(byte: u8) -> HashMap<String, u8, RandomState> {
+pub fn decode_packet_58(byte: u8) -> HashMap<String, u8> {
     let mut stasis: HashMap<String, u8> = HashMap::new();
     let bits = decode_individual_bits(byte);
     let disabled = bits.get("bit1").unwrap();
