@@ -2,7 +2,7 @@ use crate::roomba::decode::*;
 use byteorder::{BigEndian, ByteOrder};
 use std::collections::hash_map::RandomState;
 use std::collections::HashMap;
-use std::io::{Cursor, Error, Write};
+use std::io::{Cursor, Error, Read, Write};
 use std::time::Duration;
 use std::{io, thread};
 
@@ -33,47 +33,72 @@ pub fn duplex() {
     // send out 4 bytes every 15 ms
     thread::spawn(move || loop {
         clone
-            .write_all(&[142, 100])
+            .write_all(&[142, 10])
             .expect("Failed to write to serial port");
-        thread::sleep(Duration::from_millis(15))
+        clone.flush().unwrap();
+        thread::sleep(Duration::from_millis(15));
     });
-    // clone
-    //     .write_all(&[142, 23])
-    //     .expect("Failed to write to serial port");
 
     // Read the response from the cloned port
-    let mut buffer = [0u8; 80];
+    let mut buffer = [0u8; 10];
     let mut _count = 1;
     loop {
         match port.read(&mut buffer) {
             Ok(bytes_recvd) => {
-                thread::sleep(Duration::from_millis(15));
                 _count += 1;
                 println!("count: {}", _count);
                 println!("buffer size: {} bytes", bytes_recvd);
                 println!("buffer content: {:?}", &buffer);
-                println!("packet 58: {:?}", &buffer[79..]);
-                let value1 = byteorder::BigEndian::read_i16(&buffer[79..]);
-                println!("buffer decode: {}", value1);
+                if bytes_recvd == buffer.len() {
+                    decode_battery_packets(buffer)
+                }
             }
             Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
             Err(e) => eprintln!("This is an error: {:?}", e),
+        }
+        port.flush().unwrap();
+        thread::sleep(Duration::from_millis(15));
+    }
+}
+
+#[derive(Debug)]
+enum Value {
+    Str(String),
+    Bool(bool),
+    Int16(i16),
+    Uint16(u16),
+    Int8(i8),
+    Uint8(u8),
+    HashMap(HashMap<String, u8>),
+}
+
+fn inspect(value: Value) -> String {
+    match value {
+        Value::Str(v) => {
+            format!("{}", v)
+        }
+        Value::Bool(v) => {
+            format!("{}", v)
+        }
+        Value::Int16(v) => {
+            format!("{}", v)
+        }
+        Value::Uint16(v) => {
+            format!("{}", v)
+        }
+        Value::Int8(v) => {
+            format!("{}", v)
+        }
+        Value::Uint8(v) => {
+            format!("{}", v)
+        }
+        Value::HashMap(v) => {
+            format!("{:?}", v)
         }
     }
 }
 
 pub fn decode_sensor_packets(byte_data: [u8; 80]) {
-    #[derive(Debug)]
-    enum Value {
-        Str(String),
-        Bool(bool),
-        Int16(i16),
-        Uint16(u16),
-        Int8(i8),
-        Uint8(u8),
-        HashMap(HashMap<String, u8>),
-    }
-
     let mut sensor_data = HashMap::new();
 
     // size 80, contains 7-58 (ALL)
@@ -262,7 +287,44 @@ pub fn decode_sensor_packets(byte_data: [u8; 80]) {
         Value::HashMap(decode_packet_7(byte_data[0])),
     );
 
-    for (key, value) in &sensor_data {
-        println!("{}: {:?}", key, value);
+    for (key, value) in sensor_data {
+        println!("{}: {:?}", key, inspect(value));
+    }
+}
+
+pub fn decode_battery_packets(byte_data: [u8; 10]) {
+    let mut sensor_data = HashMap::new();
+
+    let mut vec = byte_data.to_vec();
+
+    //size 10, contains 21-26
+    sensor_data.insert(
+        "battery capacity",
+        Value::Uint16(decode_packet_26(vec.pop().unwrap(), vec.pop().unwrap())),
+    );
+    sensor_data.insert(
+        "battery charge",
+        Value::Uint16(decode_packet_25(vec.pop().unwrap(), vec.pop().unwrap())),
+    );
+    sensor_data.insert(
+        "temperature",
+        Value::Int8(decode_packet_24(vec.pop().unwrap())),
+    );
+
+    sensor_data.insert(
+        "current",
+        Value::Int16(decode_packet_23(vec.pop().unwrap(), vec.pop().unwrap())),
+    );
+    sensor_data.insert(
+        "voltage",
+        Value::Uint16(decode_packet_22(vec.pop().unwrap(), vec.pop().unwrap())),
+    );
+    sensor_data.insert(
+        "charging state",
+        Value::Uint8(decode_packet_21(vec.pop().unwrap())),
+    );
+
+    for (key, value) in sensor_data {
+        println!("{}: {:?}", key, inspect(value));
     }
 }

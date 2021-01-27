@@ -137,7 +137,7 @@ pub fn decode_bool(byte: u8) -> bool {
     byte != 0
 }
 
-/// Decode Packet 14 (wheel overcurrents) and return its value
+/// Decode Packet 7 (wheel drop and bumps) and return its value
 ///
 /// The state of the bumper (0 = no bump, 1 = bump) and wheel drop sensors (0 = wheel raised, 1 = wheel
 /// dropped) are sent as individual bits.
