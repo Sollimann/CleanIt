@@ -42,22 +42,23 @@ fn test_decode_byte() {
 
 #[test]
 fn test_decode_two_bytes_as_signed_16_bit() {
-    let byte_array = [255, 56];
-    let value: i16 = decode_short(byte_array[0], byte_array[1]);
+    let mut byte_array = [255, 56].to_vec();
+
+    let value: i16 = decode_short(byte_array.pop().unwrap(), byte_array.pop().unwrap());
     assert_eq!(value, -200);
 }
 
 #[test]
 fn test_decode_two_bytes_as_unsigned_16_bit() {
-    let byte_array = [255, 56];
-    let value = decode_unsigned_short(byte_array[0], byte_array[1]);
+    let mut byte_array = [255, 56].to_vec();
+    let value = decode_unsigned_short(byte_array.pop().unwrap(), byte_array.pop().unwrap());
     assert_eq!(value, 65336);
 }
 
 #[test]
 fn test_decode_one_bytes_as_boolean() {
-    let byte_array = [6];
-    let value = decode_bool(byte_array[0]);
+    let mut byte_array = [6].to_vec();
+    let value = decode_bool(byte_array.pop().unwrap());
     assert_eq!(value, true);
 }
 
@@ -78,5 +79,5 @@ fn test_decode_all_sensor_data() {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0, 4, 0, 0, 0, 8, 0, 0, 0,
     ];
 
-    decode_sensor_packets(buffer)
+    decode_sensor_packets(buffer);
 }

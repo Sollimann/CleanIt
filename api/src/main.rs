@@ -1,12 +1,13 @@
 use drivers;
 
+use drivers::roomba::mode::mode_commands;
 use drivers::roomba::read_states::sensors;
-use drivers::roomba::{drive, duplex, reading};
+use drivers::roomba::{drive, duplex, mode, reading};
 
 fn main() {
     //reading::open_and_configure_port();
     //reading::list_ports();
-    duplex::duplex();
-    //sensors()
-    //drive::drive();
+    //duplex::duplex();
+    drive::drive();
+    //mode_commands();
 }

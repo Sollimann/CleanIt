@@ -95,7 +95,7 @@ pub fn decode_byte(byte: u8) -> i8 {
 ///          easier when popping
 ///
 /// Returns: 16-bit signed value using two’s complement
-pub fn decode_unsigned_short(high: u8, low: u8) -> u16 {
+pub fn decode_unsigned_short(low: u8, high: u8) -> u16 {
     let two_byte_buffer = [high, low];
     let encoded_hex = encode(two_byte_buffer);
     let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
@@ -117,7 +117,7 @@ pub fn decode_unsigned_short(high: u8, low: u8) -> u16 {
 ///          easier when popping
 ///
 /// Returns: 16-bit signed value using two’s complement
-pub fn decode_short(high: u8, low: u8) -> i16 {
+pub fn decode_short(low: u8, high: u8) -> i16 {
     let two_byte_buffer = [high, low];
     let encoded_hex = encode(two_byte_buffer);
     let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
@@ -369,8 +369,8 @@ pub fn decode_packet_18(byte: u8) -> HashMap<String, u8> {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: signed 16 bit short. Represents difference between distance two wheels travelled
-pub fn decode_packet_19(high: u8, low: u8) -> i16 {
-    decode_short(high, low)
+pub fn decode_packet_19(low: u8, high: u8) -> i16 {
+    decode_short(low, high)
 }
 
 /// Decode Packet 20 (angle) and return its value
@@ -391,8 +391,8 @@ pub fn decode_packet_19(high: u8, low: u8) -> i16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: signed 16 bit short. Represents difference between distance two wheels travelled
-pub fn decode_packet_20(high: u8, low: u8) -> i16 {
-    decode_short(high, low)
+pub fn decode_packet_20(low: u8, high: u8) -> i16 {
+    decode_short(low, high)
 }
 
 /// Decode Packet 21 (charging state) and return its value
@@ -425,8 +425,8 @@ pub fn decode_packet_21(byte: u8) -> u8 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short, battery voltage in mV
-pub fn decode_packet_22(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_22(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 23 (current) and return its value
@@ -441,8 +441,8 @@ pub fn decode_packet_22(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: signed 16bit short. Positive currents is charging, negative is discharging
-pub fn decode_packet_23(high: u8, low: u8) -> i16 {
-    decode_short(high, low)
+pub fn decode_packet_23(low: u8, high: u8) -> i16 {
+    decode_short(low, high)
 }
 
 /// Decode Packet 24 (temperature) and return its value
@@ -469,8 +469,8 @@ pub fn decode_packet_24(byte: u8) -> i8 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Current charge of battery in milliAmp-hours
-pub fn decode_packet_25(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_25(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 26 (battery capacity) and return its value
@@ -483,8 +483,8 @@ pub fn decode_packet_25(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Estimated charge capacity of battery in milliAmp-hours
-pub fn decode_packet_26(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_26(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 27 (wall signal) and return its value
@@ -499,8 +499,8 @@ pub fn decode_packet_26(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Strength of wall signal from 0-1023
-pub fn decode_packet_27(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_27(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 28 (cliff left signal) and return its value
@@ -513,8 +513,8 @@ pub fn decode_packet_27(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Strength of cliff left signal from 0-4095
-pub fn decode_packet_28(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_28(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 29 (cliff front left signal) and return its value
@@ -527,8 +527,8 @@ pub fn decode_packet_28(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Strength of cliff front left signal from 0-4095
-pub fn decode_packet_29(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_29(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 30 (cliff front right signal) and return its value
@@ -541,8 +541,8 @@ pub fn decode_packet_29(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Strength of cliff front right signal from 0-4095
-pub fn decode_packet_30(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_30(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 31 (cliff right signal) and return its value
@@ -555,8 +555,8 @@ pub fn decode_packet_30(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Strength of cliff right signal from 0-4095
-pub fn decode_packet_31(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_31(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 33 (Unused) and return its value
@@ -662,8 +662,8 @@ pub fn decode_packet_38(byte: u8) -> u8 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: signed 16bit short. Velocity most recently requested by Drive()
-pub fn decode_packet_39(high: u8, low: u8) -> i16 {
-    decode_short(high, low)
+pub fn decode_packet_39(low: u8, high: u8) -> i16 {
+    decode_short(low, high)
 }
 
 /// Decode Packet 40 (requested radius) and return its value
@@ -684,8 +684,8 @@ pub fn decode_packet_39(high: u8, low: u8) -> i16 {
 /// example: r3_robot/tags/release-3.3.0.
 ///
 /// Returns: signed 16bit short. Radius most recently requested by Drive()
-pub fn decode_packet_40(high: u8, low: u8) -> i16 {
-    decode_short(high, low)
+pub fn decode_packet_40(low: u8, high: u8) -> i16 {
+    decode_short(low, high)
 }
 
 /// Decode Packet 41 (Requested right velocity) and return its value
@@ -699,8 +699,8 @@ pub fn decode_packet_40(high: u8, low: u8) -> i16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: signed 16bit short. right wheel velocity recently requested by DriveDirect()
-pub fn decode_packet_41(high: u8, low: u8) -> i16 {
-    decode_short(high, low)
+pub fn decode_packet_41(low: u8, high: u8) -> i16 {
+    decode_short(low, high)
 }
 
 /// Decode Packet 42 (Requested left velocity) and return its value
@@ -714,8 +714,8 @@ pub fn decode_packet_41(high: u8, low: u8) -> i16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: signed 16bit short. Left wheel velocity recently requested by DriveDirect()
-pub fn decode_packet_42(high: u8, low: u8) -> i16 {
-    decode_short(high, low)
+pub fn decode_packet_42(low: u8, high: u8) -> i16 {
+    decode_short(low, high)
 }
 
 /// Decode Packet 43 (Left Encoder Counts) and return its value
@@ -737,8 +737,8 @@ pub fn decode_packet_42(high: u8, low: u8) -> i16 {
 ///
 /// Returns: unsigned 16bit short. Cumulative number of raw right encoder counts. Rolls over
 //           to 0 after it passes 65535
-pub fn decode_packet_43(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_43(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 44 (Right Encoder Counts) and return its value
@@ -760,8 +760,8 @@ pub fn decode_packet_43(high: u8, low: u8) -> u16 {
 ///
 /// Returns: unsigned 16bit short. Cumulative number of raw right encoder counts. Rolls over
 ///          to 0 after it passes 65535
-pub fn decode_packet_44(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_44(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 45 (infrared char left) and return its value
@@ -800,8 +800,8 @@ pub fn decode_packet_45(byte: u8) -> HashMap<String, u8> {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
-pub fn decode_packet_46(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_46(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 47 (Light Bump Front Left Signal) and return its value
@@ -814,8 +814,8 @@ pub fn decode_packet_46(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
-pub fn decode_packet_47(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_47(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 48 (Light Bump Center Left Signal) and return its value
@@ -828,8 +828,8 @@ pub fn decode_packet_47(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
-pub fn decode_packet_48(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_48(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 49 (Light Bump Center Right Signal) and return its value
@@ -842,8 +842,8 @@ pub fn decode_packet_48(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
-pub fn decode_packet_49(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_49(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 50 (Light Bump Front Right Signal) and return its value
@@ -856,8 +856,8 @@ pub fn decode_packet_49(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
-pub fn decode_packet_50(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_50(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 51 (Light Bump Right Signal) and return its value
@@ -870,8 +870,8 @@ pub fn decode_packet_50(high: u8, low: u8) -> u16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: unsigned 16bit short. Strength of light bump right signal from 0-4095
-pub fn decode_packet_51(high: u8, low: u8) -> u16 {
-    decode_unsigned_short(high, low)
+pub fn decode_packet_51(low: u8, high: u8) -> u16 {
+    decode_unsigned_short(low, high)
 }
 
 /// Decode Packet 52 (infrared char left) and return its value
@@ -914,8 +914,8 @@ pub fn decode_packet_53(byte: u8) -> u8 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: signed 16bit short. Strength of side brush motor current from -32768 - 32767 mA
-pub fn decode_packet_54(high: u8, low: u8) -> i16 {
-    decode_short(high, low)
+pub fn decode_packet_54(low: u8, high: u8) -> i16 {
+    decode_short(low, high)
 }
 
 /// Decode Packet 55 (Right Motor Current) and return its value
@@ -928,8 +928,8 @@ pub fn decode_packet_54(high: u8, low: u8) -> i16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: signed 16bit short. Strength of side brush motor current from -32768 - 32767 mA
-pub fn decode_packet_55(high: u8, low: u8) -> i16 {
-    decode_short(high, low)
+pub fn decode_packet_55(low: u8, high: u8) -> i16 {
+    decode_short(low, high)
 }
 
 /// Decode Packet 56 (Main Brush Motor Current) and return its value
@@ -942,8 +942,8 @@ pub fn decode_packet_55(high: u8, low: u8) -> i16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: signed 16bit short. Strength of side brush motor current from -32768 - 32767 mA
-pub fn decode_packet_56(high: u8, low: u8) -> i16 {
-    decode_short(high, low)
+pub fn decode_packet_56(low: u8, high: u8) -> i16 {
+    decode_short(low, high)
 }
 
 /// Decode Packet 57 (Side Brush Motor Current) and return its value
@@ -956,8 +956,8 @@ pub fn decode_packet_56(high: u8, low: u8) -> i16 {
 ///     low: The low byte of the 2's complement
 ///
 /// Returns: signed 16bit short. Strength of side brush motor current from -32768 - 32767 mA
-pub fn decode_packet_57(high: u8, low: u8) -> i16 {
-    decode_short(high, low)
+pub fn decode_packet_57(low: u8, high: u8) -> i16 {
+    decode_short(low, high)
 }
 
 /// Decode Packet 58 (Stasis) and return its value
