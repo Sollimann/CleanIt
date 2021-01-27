@@ -4,16 +4,14 @@ use std::alloc::Global;
 use std::time::Duration;
 use std::{io, thread};
 
-pub fn sensors(mut port: Box<dyn SerialPort, Global>) -> Box<dyn SerialPort, Global> {
+pub fn read_all_sensors(mut port: Box<dyn SerialPort, Global>) -> Box<dyn SerialPort, Global> {
     // Read the response from the cloned port
     let mut buffer = [0u8; 80];
     let mut _count = 1;
     loop {
-        port.flush().unwrap();
-        thread::sleep(Duration::from_millis(15));
         port.write_all(&[142, 100])
             .expect("Failed to write to serial port");
-        //thread::sleep(Duration::from_millis(8));
+        port.flush().unwrap();
         match port.read(&mut buffer) {
             Ok(bytes_recvd) => {
                 _count += 1;
@@ -29,8 +27,9 @@ pub fn sensors(mut port: Box<dyn SerialPort, Global>) -> Box<dyn SerialPort, Glo
             Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
             Err(e) => eprintln!("This is an error: {:?}", e),
         };
-
-        if _count > 1000 {
+        port.flush().unwrap();
+        thread::sleep(Duration::from_millis(15));
+        if _count > 500 {
             break;
         }
     }

@@ -14,9 +14,11 @@ pub fn startup() -> Box<dyn SerialPort, Global> {
     // Open the first serialport available
     let port_name = &serialport::available_ports().expect("No serial port")[0].port_name;
     let mut port = serialport::new(port_name, 115_200)
+        .timeout(Duration::from_millis(30))
         .open()
         .expect("Failed to open serial port");
 
+    //port.set_timeout(Duration::from_millis(30));
     // Write a buffer into this writer, returning how many bytes were written.
     // https://doc.rust-lang.org/nightly/std/io/trait.Write.html
     port.flush().unwrap();
