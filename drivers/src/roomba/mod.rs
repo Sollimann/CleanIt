@@ -4,4 +4,5 @@ pub mod duplex;
 pub mod mode;
 pub mod read_states;
 pub mod reading;
+pub mod serial_stream;
 pub mod startup;

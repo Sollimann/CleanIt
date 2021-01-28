@@ -1,8 +1,10 @@
+use byteorder::{BigEndian, ReadBytesExt};
 use hex::{decode, encode};
 use parse_int::parse;
 use std::borrow::Borrow;
 use std::collections::hash_map::RandomState;
 use std::collections::HashMap;
+use std::io::Cursor;
 
 const HEX_PREFIX: &str = "0x";
 
@@ -77,7 +79,9 @@ pub fn decode_unsigned_byte(byte: u8) -> u8 {
 ///
 /// Returns: An unsigned int in range 0-255
 pub fn decode_byte(byte: u8) -> i8 {
-    byte as i8
+    //byte as i8
+    let mut data = Cursor::new(vec![byte]);
+    data.read_i8().unwrap()
 }
 
 /// Decode a unsigned 16 bit short from two bytes
@@ -96,10 +100,14 @@ pub fn decode_byte(byte: u8) -> i8 {
 ///
 /// Returns: 16-bit signed value using two’s complement
 pub fn decode_unsigned_short(low: u8, high: u8) -> u16 {
-    let two_byte_buffer = [high, low];
-    let encoded_hex = encode(two_byte_buffer);
-    let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
-    parse::<u16>(&prefixed_hex).unwrap()
+    // let two_byte_buffer = [high, low];
+    // let encoded_hex = encode(two_byte_buffer);
+    // let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
+    // parse::<u16>(&prefixed_hex).unwrap()
+
+    // BigEndian means buffer is interpreted as most significant (high) byte to the left
+    let mut data = Cursor::new(vec![high, low]);
+    data.read_u16::<BigEndian>().unwrap()
 }
 
 /// Decode a signed 16 bit short from two bytes
@@ -118,11 +126,14 @@ pub fn decode_unsigned_short(low: u8, high: u8) -> u16 {
 ///
 /// Returns: 16-bit signed value using two’s complement
 pub fn decode_short(low: u8, high: u8) -> i16 {
-    let two_byte_buffer = [high, low];
-    let encoded_hex = encode(two_byte_buffer);
-    let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
-    let decoded_decimal = parse::<u16>(&prefixed_hex);
-    decoded_decimal.unwrap() as i16
+    // let two_byte_buffer = [high, low];
+    // let encoded_hex = encode(two_byte_buffer);
+    // let prefixed_hex = format!("{}{}", HEX_PREFIX, encoded_hex);
+    // let decoded_decimal = parse::<u16>(&prefixed_hex);
+    // decoded_decimal.unwrap() as i16
+
+    let mut data = Cursor::new(vec![high, low]);
+    data.read_i16::<BigEndian>().unwrap()
 }
 
 /// Decode a byte and return the value

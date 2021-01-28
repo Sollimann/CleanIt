@@ -6,7 +6,11 @@ use drivers::roomba::decode::{
     decode_unsigned_byte, decode_unsigned_short,
 };
 use drivers::roomba::duplex::decode_sensor_packets;
+use drivers::roomba::serial_stream::read_if_not_corrupt;
+use drivers::utils::checksum::Checksum;
+use hex::FromHex;
 
+// Integration tests
 #[test]
 fn list_available_ports_test() {
     roomba::reading::list_ports()
@@ -61,6 +65,22 @@ fn test_decode_one_bytes_as_boolean() {
     let value = decode_bool(byte_array.pop().unwrap());
     assert_eq!(value, true);
 }
+// testing
+
+#[test]
+fn test_decode_two_bytes_as_signed_16_bit_2() {
+    let mut byte_array = [23, 16].to_vec();
+
+    let value: i16 = decode_short(byte_array.pop().unwrap(), byte_array.pop().unwrap());
+    assert_eq!(value, -200);
+}
+
+#[test]
+fn test_decode_two_bytes_as_unsigned_16_bit_2() {
+    let mut byte_array = [2, 25].to_vec();
+    let value = decode_unsigned_short(byte_array.pop().unwrap(), byte_array.pop().unwrap());
+    assert_eq!(value, 549);
+}
 
 // Test decode packages
 
@@ -80,4 +100,16 @@ fn test_decode_all_sensor_data() {
     ];
 
     decode_sensor_packets(buffer);
+}
+
+#[test]
+fn test_decode_serial_stream() {
+    let buffer_output: [u8; 8] = [19, 5, 29, 2, 25, 13, 0, 163];
+
+    let mut checksum = Checksum::new();
+    checksum.push_slice(&buffer_output);
+
+    let mut byte_data = buffer_output.to_vec();
+    let nbytes = 5_u8;
+    read_if_not_corrupt(&mut checksum, &mut byte_data, nbytes);
 }
