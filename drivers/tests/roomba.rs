@@ -9,7 +9,6 @@ use drivers::roomba::duplex::decode_sensor_packets;
 use drivers::roomba::serial_stream::{decode_relevant_states, sanitize_and_read};
 use drivers::utils::checksum::Checksum;
 use drivers::utils::vector_manipulation::extract_sublist;
-use hex::FromHex;
 
 // Integration tests
 #[test]

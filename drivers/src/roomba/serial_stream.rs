@@ -15,15 +15,7 @@ const PACKET_29_13: [u8; 4] = [STREAM, NR_OF_PACKS_REQUESTED, 29, 13];
 
 // head and tail size
 const HEADER_BYTE: u8 = 19;
-const HEADER_SIZE: u8 = 1_u8;
-const CHECKSUM_SIZE: u8 = 1_u8;
-
-// packet sizes
-const PACKET_29_SIZE: u8 = 2_u8;
-const PACKET_13_SIZE: u8 = 1_u8;
-const NBYTES: u8 = NR_OF_PACKS_REQUESTED + PACKET_29_SIZE + PACKET_13_SIZE;
-
-const READ_BUFFER_SIZE: usize = (HEADER_SIZE + NBYTES + CHECKSUM_SIZE) as usize;
+const NBYTES: u8 = 5;
 
 pub fn read_serial_stream(
     mut port: Box<dyn SerialPort, Global>,
@@ -53,12 +45,8 @@ pub fn read_serial_stream(
                 println!("buffer content: {:?}", &read_buffer);
                 let mut byte_data = read_buffer.to_vec();
 
-                if extract_sublist(
-                    &mut byte_data,
-                    [HEADER_BYTE, NBYTES],
-                    READ_BUFFER_SIZE,
-                    &mut checksum,
-                ) {
+                if extract_sublist(&mut byte_data, [19, 5], 8, &mut checksum) {
+                    println!("Before sanitize and read: {:?}", byte_data);
                     sanitize_and_read(&mut byte_data, nbytes, f);
                 } else {
                     println!("corrupted buffer")

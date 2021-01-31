@@ -7,6 +7,6 @@ fn main() {
     //reading::open_and_configure_port();
     //reading::list_ports();
     //duplex::duplex();
-    //drive::drive();
-    mode_commands();
+    drive::drive();
+    //mode_commands();
 }

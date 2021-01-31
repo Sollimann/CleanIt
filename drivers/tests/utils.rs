@@ -11,8 +11,9 @@ use std::io::Cursor;
 #[test]
 fn test_vector_manipulation() {
     let mut buffer = vec![13, 0, 168, 19, 5, 29, 4, 5, 13, 0, 168, 19, 5, 29, 4];
+    let mut checksum = Checksum::new();
 
-    let succeeded = extract_sublist(&mut buffer, [19, 5], 8);
+    let succeeded = extract_sublist(&mut buffer, [19, 5], 8, &mut checksum);
 
     assert_eq!(buffer, vec![19, 5, 29, 4, 5, 13, 0, 168]);
     assert_eq!(true, succeeded);
