@@ -5,7 +5,18 @@ use drivers::utils::checksum::Checksum;
 
 use byteorder::{BigEndian, ReadBytesExt};
 use byteorder::{LittleEndian, WriteBytesExt};
+use drivers::utils::vector_manipulation::extract_sublist;
 use std::io::Cursor;
+
+#[test]
+fn test_vector_manipulation() {
+    let mut buffer = vec![13, 0, 168, 19, 5, 29, 4, 5, 13, 0, 168, 19, 5, 29, 4];
+
+    let succeeded = extract_sublist(&mut buffer, [19, 5], 8);
+
+    assert_eq!(buffer, vec![19, 5, 29, 4, 5, 13, 0, 168]);
+    assert_eq!(true, succeeded);
+}
 
 #[test]
 fn test_big_endian_i16() {

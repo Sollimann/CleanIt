@@ -77,13 +77,13 @@ pub fn read_if_not_corrupt(checksum: &mut Checksum, byte_data: &mut Vec<u8, Glob
         checksum.reset();
 
         println!("running decode stream with byte data: {:?}", byte_data);
-        decode_stream_ex(byte_data);
+        decode_relevant_states(byte_data);
     } else {
         println!("checksum or/and sanitize is wrong")
     }
 }
 
-fn decode_stream_ex(byte_data: &mut Vec<u8, Global>) {
+fn decode_relevant_states(byte_data: &mut Vec<u8, Global>) {
     let mut sensor_data = HashMap::new();
 
     if byte_data.remove(0) == 29 {
