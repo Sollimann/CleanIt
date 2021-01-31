@@ -6,8 +6,9 @@ use drivers::roomba::decode::{
     decode_unsigned_byte, decode_unsigned_short,
 };
 use drivers::roomba::duplex::decode_sensor_packets;
-use drivers::roomba::serial_stream::read_if_not_corrupt;
+use drivers::roomba::serial_stream::{decode_relevant_states, sanitize_and_read};
 use drivers::utils::checksum::Checksum;
+use drivers::utils::vector_manipulation::extract_sublist;
 use hex::FromHex;
 
 // Integration tests
@@ -104,12 +105,19 @@ fn test_decode_all_sensor_data() {
 
 #[test]
 fn test_decode_serial_stream() {
-    let buffer_output: [u8; 8] = [19, 5, 29, 2, 25, 13, 0, 163];
+    let buffer_output = [13, 0, 168, 19, 5, 29, 2, 25, 13, 0, 168, 19, 5, 29, 4];
+    let header_byte: u8 = 19;
+    let nbytes: u8 = 5;
 
     let mut checksum = Checksum::new();
-    checksum.push_slice(&buffer_output);
 
     let mut byte_data = buffer_output.to_vec();
-    let nbytes = 5_u8;
-    read_if_not_corrupt(&mut checksum, &mut byte_data, nbytes);
+
+    let succeeded = extract_sublist(&mut byte_data, [header_byte, nbytes], 8, &mut checksum);
+
+    assert_eq!(byte_data, vec![19, 5, 29, 2, 25, 13, 0, 168]);
+    assert_eq!(true, succeeded);
+
+    checksum.push_slice(&buffer_output);
+    sanitize_and_read(&mut byte_data, nbytes, decode_relevant_states);
 }

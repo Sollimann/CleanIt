@@ -1,6 +1,12 @@
+use crate::utils::checksum::Checksum;
 use std::alloc::Global;
 
-pub fn extract_sublist(byte_data: &mut Vec<u8, Global>, seq: [u8; 2], slice_size: usize) -> bool {
+pub fn extract_sublist(
+    byte_data: &mut Vec<u8, Global>,
+    seq: [u8; 2],
+    slice_size: usize,
+    checksum: &mut Checksum,
+) -> bool {
     let first_index = byte_data.iter().position(|&r| r == seq[0]);
     match first_index {
         None => return false,
@@ -19,7 +25,12 @@ pub fn extract_sublist(byte_data: &mut Vec<u8, Global>, seq: [u8; 2], slice_size
                 // remove every element from after: first_index + slice_size
                 byte_data.truncate(slice_size);
 
-                return true;
+                // double-check that size is right
+                assert_eq!(byte_data.len(), slice_size);
+
+                let checksum_low_byte = checksum.calculate_low_byte_sum();
+                checksum.reset();
+                return checksum_low_byte == 0;
             }
         }
     }

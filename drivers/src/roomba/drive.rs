@@ -1,5 +1,5 @@
 use crate::roomba::read_states::read_all_sensors;
-use crate::roomba::serial_stream::read_serial_stream;
+use crate::roomba::serial_stream::{decode_relevant_states, read_serial_stream};
 use crate::roomba::startup::{shutdown, startup};
 use std::thread;
 use std::time::Duration;
@@ -16,7 +16,7 @@ pub fn drive() {
     port.write(&drive_direct);
     thread::sleep(Duration::from_millis(15));
     //port = read_all_sensors(port);
-    port = read_serial_stream(port);
+    port = read_serial_stream(port, decode_relevant_states);
     //thread::sleep(Duration::from_millis(6000));
     port.write(&stop);
     thread::sleep(Duration::from_millis(4000));

@@ -1,6 +1,7 @@
 use crate::roomba::decode::{decode_packet_13, decode_packet_29};
 use crate::utils::checksum::Checksum;
 use crate::utils::enums::{inspect, Value};
+use crate::utils::vector_manipulation::extract_sublist;
 use serialport::SerialPort;
 use std::alloc::Global;
 use std::collections::HashMap;
@@ -24,8 +25,13 @@ const NBYTES: u8 = NR_OF_PACKS_REQUESTED + PACKET_29_SIZE + PACKET_13_SIZE;
 
 const READ_BUFFER_SIZE: usize = (HEADER_SIZE + NBYTES + CHECKSUM_SIZE) as usize;
 
-pub fn read_serial_stream(mut port: Box<dyn SerialPort, Global>) -> Box<dyn SerialPort, Global> {
+pub fn read_serial_stream(
+    mut port: Box<dyn SerialPort, Global>,
+    f: fn(&mut Vec<u8, Global>) -> (),
+) -> Box<dyn SerialPort, Global> {
     let write_buffer = PACKET_29_13;
+
+    // let the buffer size be twice the expected size which is 8 atm
     let mut read_buffer = [0u8; 16];
     let nbytes = NBYTES;
 
@@ -45,11 +51,15 @@ pub fn read_serial_stream(mut port: Box<dyn SerialPort, Global>) -> Box<dyn Seri
                 println!("count: {}", _count);
                 println!("buffer size: {} bytes", bytes_recvd);
                 println!("buffer content: {:?}", &read_buffer);
+                let mut byte_data = read_buffer.to_vec();
 
-                if bytes_recvd == read_buffer.len() {
-                    checksum.push_slice(&read_buffer);
-                    let mut byte_data = read_buffer.to_vec();
-                    read_if_not_corrupt(&mut checksum, &mut byte_data, nbytes);
+                if extract_sublist(
+                    &mut byte_data,
+                    [HEADER_BYTE, NBYTES],
+                    READ_BUFFER_SIZE,
+                    &mut checksum,
+                ) {
+                    sanitize_and_read(&mut byte_data, nbytes, f);
                 } else {
                     println!("corrupted buffer")
                 }
@@ -67,23 +77,22 @@ pub fn read_serial_stream(mut port: Box<dyn SerialPort, Global>) -> Box<dyn Seri
     port
 }
 
-pub fn read_if_not_corrupt(checksum: &mut Checksum, byte_data: &mut Vec<u8, Global>, nbytes: u8) {
-    let checksum_low_byte = checksum.calculate_low_byte_sum();
+pub fn sanitize_and_read(
+    byte_data: &mut Vec<u8, Global>,
+    nbytes: u8,
+    f: fn(&mut Vec<u8, Global>) -> (),
+) {
     let sanitize_ok = sanitize(byte_data, nbytes);
 
-    println!("checksum low byte: {}", checksum_low_byte);
-
-    if checksum_low_byte == 0 && sanitize_ok {
-        checksum.reset();
-
+    if sanitize_ok {
         println!("running decode stream with byte data: {:?}", byte_data);
-        decode_relevant_states(byte_data);
+        f(byte_data);
     } else {
         println!("checksum or/and sanitize is wrong")
     }
 }
 
-fn decode_relevant_states(byte_data: &mut Vec<u8, Global>) {
+pub fn decode_relevant_states(byte_data: &mut Vec<u8, Global>) {
     let mut sensor_data = HashMap::new();
 
     if byte_data.remove(0) == 29 {
