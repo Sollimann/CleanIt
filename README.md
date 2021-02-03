@@ -1,10 +1,12 @@
-# *CleanIt*
+<h1 align="center">CleanIt</h1>
+
+<p align="center">
+    <em>_Open-source Autonomy Software in Rust-lang with gRPC for the Roomba series robot vacuum cleaners_</em>
+</p>
 
 <p align="center">
   <img src="https://github.com/Sollimann/CleanIt/blob/main/docs/roomba.gif">
 </p>
-
-#### _Open-source Autonomy Software in Rust-lang with gRPC for the Roomba series robot vacuum cleaners_
 
 ## Motivation
 
