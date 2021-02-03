@@ -1,7 +1,7 @@
 <h1 align="center">CleanIt</h1>
 
 <p align="center">
-    <em>_Open-source Autonomy Software in Rust-lang with gRPC for the Roomba series robot vacuum cleaners_</em>
+    <em>Open-source Autonomy Software in Rust-lang with gRPC for the Roomba series robot vacuum cleaners</em>
 </p>
 
 <p align="center">
