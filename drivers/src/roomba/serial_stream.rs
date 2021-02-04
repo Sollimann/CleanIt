@@ -10,22 +10,46 @@ use std::{io, thread};
 
 // opcode
 const STREAM: u8 = 148_u8;
-const NR_OF_PACKS_REQUESTED: u8 = 2_u8;
-const PACKET_29_13: [u8; 4] = [STREAM, NR_OF_PACKS_REQUESTED, 29, 13];
+// const NR_OF_PACKS_REQUESTED: u8 = 2_u8;
+// const PACKET_29_13: [u8; 4] = [STREAM, NR_OF_PACKS_REQUESTED, 29, 13];
+// const NBYTES: u8 = 5;
 
 // head and tail size
 const HEADER_BYTE: u8 = 19;
-const NBYTES: u8 = 5;
+
+// robot sensor packages wanted
+const NR_OF_SENSOR_PACKS_REQUESTED: u8 = 15_u8;
+const NR_OF_SENSOR_BYTES_RECIEVED: u8 = 39_u8;
+const SENSOR_BUFFER: [u8; 82] = [0u8; 82]; // size: 2 * (header + nbytes + sensor bytes)
+const SENSOR_PACKAGES_WANTED: [u8; 17] = [
+    STREAM,
+    NR_OF_SENSOR_PACKS_REQUESTED,
+    13,
+    21,
+    22,
+    24,
+    25,
+    26,
+    35,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    58,
+];
 
 pub fn read_serial_stream(
     mut port: Box<dyn SerialPort, Global>,
     f: fn(&mut Vec<u8, Global>) -> (),
 ) -> Box<dyn SerialPort, Global> {
-    let write_buffer = PACKET_29_13;
+    let write_buffer = SENSOR_PACKAGES_WANTED;
 
-    // let the buffer size be twice the expected size which is 8 atm
-    let mut read_buffer = [0u8; 16];
-    let nbytes = NBYTES;
+    // let the buffer size be twice the expected size
+    let mut read_buffer = SENSOR_BUFFER;
+    let nbytes = NR_OF_SENSOR_BYTES_RECIEVED;
 
     // init checksum
     let mut checksum = Checksum::new();
@@ -45,7 +69,7 @@ pub fn read_serial_stream(
                 println!("buffer content: {:?}", &read_buffer);
                 let mut byte_data = read_buffer.to_vec();
 
-                if extract_sublist(&mut byte_data, [19, 5], 8, &mut checksum) {
+                if extract_sublist(&mut byte_data, [19, nbytes], 41, &mut checksum) {
                     println!("Before sanitize and read: {:?}", byte_data);
                     sanitize_and_read(&mut byte_data, nbytes, f);
                 } else {
@@ -77,28 +101,6 @@ pub fn sanitize_and_read(
         f(byte_data);
     } else {
         println!("checksum or/and sanitize is wrong")
-    }
-}
-
-pub fn decode_relevant_states(byte_data: &mut Vec<u8, Global>) {
-    let mut sensor_data = HashMap::new();
-
-    if byte_data.remove(0) == 29 {
-        sensor_data.insert(
-            "cliff front left signal",
-            Value::Uint16(decode_packet_29(byte_data.remove(1), byte_data.remove(0))),
-        );
-    }
-
-    if byte_data.remove(0) == 13 {
-        sensor_data.insert(
-            "virtual wall",
-            Value::Bool(decode_packet_13(byte_data.remove(0))),
-        );
-    }
-
-    for (key, value) in sensor_data {
-        println!("{}: {:?}", key, inspect(value));
     }
 }
 

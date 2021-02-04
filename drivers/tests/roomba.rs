@@ -1,25 +1,25 @@
 extern crate drivers;
 
-use drivers::roomba;
 use drivers::roomba::decode::{
     decode_bool, decode_byte, decode_individual_bits, decode_packet_58, decode_short,
     decode_unsigned_byte, decode_unsigned_short,
 };
 use drivers::roomba::duplex::decode_sensor_packets;
-use drivers::roomba::serial_stream::{decode_relevant_states, sanitize_and_read};
+use drivers::roomba::packets::example_packets::decode_example_packets;
+use drivers::roomba::serial_stream::sanitize_and_read;
 use drivers::utils::checksum::Checksum;
 use drivers::utils::vector_manipulation::extract_sublist;
 
 // Integration tests
-#[test]
-fn list_available_ports_test() {
-    roomba::reading::list_ports()
-}
-
-#[test]
-fn read_from_port() {
-    roomba::reading::open_and_configure_port()
-}
+// #[test]
+// fn list_available_ports_test() {
+//     roomba::reading::list_ports()
+// }
+//
+// #[test]
+// fn read_from_port() {
+//     roomba::reading::open_and_configure_port()
+// }
 
 // Test decode util functions
 
@@ -69,17 +69,17 @@ fn test_decode_one_bytes_as_boolean() {
 
 #[test]
 fn test_decode_two_bytes_as_signed_16_bit_2() {
-    let mut byte_array = [23, 16].to_vec();
+    let mut byte_array = [2, 25].to_vec();
 
     let value: i16 = decode_short(byte_array.pop().unwrap(), byte_array.pop().unwrap());
-    assert_eq!(value, -200);
+    assert_eq!(value, 537);
 }
 
 #[test]
 fn test_decode_two_bytes_as_unsigned_16_bit_2() {
     let mut byte_array = [2, 25].to_vec();
     let value = decode_unsigned_short(byte_array.pop().unwrap(), byte_array.pop().unwrap());
-    assert_eq!(value, 549);
+    assert_eq!(value, 537);
 }
 
 // Test decode packages
@@ -118,5 +118,5 @@ fn test_decode_serial_stream() {
     assert_eq!(true, succeeded);
 
     checksum.push_slice(&buffer_output);
-    sanitize_and_read(&mut byte_data, nbytes, decode_relevant_states);
+    sanitize_and_read(&mut byte_data, nbytes, decode_example_packets);
 }
