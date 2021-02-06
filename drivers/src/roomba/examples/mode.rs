@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::thread;
 use std::time::Duration;
 

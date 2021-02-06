@@ -4,8 +4,10 @@ use drivers::roomba::decode::{
     decode_bool, decode_byte, decode_individual_bits, decode_packet_58, decode_short,
     decode_unsigned_byte, decode_unsigned_short,
 };
-use drivers::roomba::duplex::decode_sensor_packets;
+
 use drivers::roomba::packets::example_packets::decode_example_packets;
+use drivers::roomba::packets::sensor_packets::decode_sensor_packets;
+use drivers::roomba::packets::sensor_packets_all::decode_all_sensor_packets;
 use drivers::roomba::serial_stream::sanitize_and_read;
 use drivers::utils::checksum::Checksum;
 use drivers::utils::vector_manipulation::extract_sublist;
@@ -99,12 +101,12 @@ fn test_decode_all_sensor_data() {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0, 4, 0, 0, 0, 8, 0, 0, 0,
     ];
 
-    decode_sensor_packets(buffer);
+    decode_all_sensor_packets(buffer);
 }
 
 #[test]
 fn test_decode_serial_stream() {
-    let buffer_output = [13, 0, 168, 19, 5, 29, 2, 25, 13, 0, 168, 19, 5, 29, 4];
+    let buffer_output = [13, 0, 168, 19, 5, 29, 2, 25, 13, 0, 163, 19, 5, 29, 4];
     let header_byte: u8 = 19;
     let nbytes: u8 = 5;
 
@@ -114,9 +116,62 @@ fn test_decode_serial_stream() {
 
     let succeeded = extract_sublist(&mut byte_data, [header_byte, nbytes], 8, &mut checksum);
 
-    assert_eq!(byte_data, vec![19, 5, 29, 2, 25, 13, 0, 168]);
+    println!("byte_data: {:?}", byte_data);
+    assert_eq!(byte_data, vec![19, 5, 29, 2, 25, 13, 0, 163]);
     assert_eq!(true, succeeded);
 
     checksum.push_slice(&buffer_output);
     sanitize_and_read(&mut byte_data, nbytes, decode_example_packets);
+}
+
+#[test]
+fn test_decode_sensor_serial_stream_succeed() {
+    let buffer_output = [
+        0, 58, 0, 207, 19, 39, 13, 0, 21, 0, 22, 61, 160, 24, 20, 25, 7, 98, 26, 8, 20, 35, 3, 39,
+        0, 0, 40, 0, 0, 41, 0, 0, 42, 0, 0, 43, 10, 253, 44, 9, 105, 45, 0, 58, 0, 206, 19, 39, 13,
+        0, 21, 0, 22, 61, 160, 24, 20, 25, 7, 98, 26, 8, 20, 35, 3, 39, 0, 0, 40, 0, 0, 41, 0, 0,
+        42, 0, 0, 43, 10, 253, 44, 9, 105, 45,
+    ];
+    let header_byte: u8 = 19;
+    let nbytes: u8 = 39;
+
+    let mut checksum = Checksum::new();
+
+    let mut byte_data = buffer_output.to_vec();
+
+    let succeeded = extract_sublist(&mut byte_data, [header_byte, nbytes], 42, &mut checksum);
+
+    assert_eq!(
+        byte_data,
+        vec![
+            19, 39, 13, 0, 21, 0, 22, 61, 160, 24, 20, 25, 7, 98, 26, 8, 20, 35, 3, 39, 0, 0, 40,
+            0, 0, 41, 0, 0, 42, 0, 0, 43, 10, 253, 44, 9, 105, 45, 0, 58, 0, 206
+        ]
+    );
+    assert_eq!(true, succeeded);
+
+    // let checksum_low_byte = checksum.calculate_low_byte_sum();
+    // assert_eq!(checksum_low_byte, 0);
+    sanitize_and_read(&mut byte_data, nbytes, decode_sensor_packets);
+}
+
+#[test]
+fn test_decode_serial_stream_fail() {
+    let buffer_output = [
+        20, 35, 3, 39, 0, 0, 40, 0, 0, 41, 0, 43, 42, 0, 43, 43, 4, 222, 44, 4, 114, 45, 0, 58, 1,
+        122, 19, 39, 13, 0, 21, 0, 22, 59, 225, 24, 17, 25, 6, 69, 26, 8, 20, 35, 3, 39, 8, 59, 0,
+        0, 40, 0, 0, 41, 0, 43, 42, 0, 43, 43, 3, 59, 44, 2, 238, 45, 0, 58, 1, 165, 19, 39, 13, 0,
+        21, 0, 22, 59, 225, 24, 16, 25, 6, 69,
+    ];
+
+    let header_byte: u8 = 19;
+    let nbytes: u8 = 39;
+
+    let mut checksum = Checksum::new();
+
+    let mut byte_data = buffer_output.to_vec();
+
+    let succeeded = extract_sublist(&mut byte_data, [header_byte, nbytes], 42, &mut checksum);
+
+    assert_eq!(false, succeeded);
 }

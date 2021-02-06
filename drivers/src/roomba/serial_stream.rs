@@ -2,6 +2,7 @@ use crate::roomba::decode::{decode_packet_13, decode_packet_29};
 use crate::utils::checksum::Checksum;
 use crate::utils::enums::{inspect, Value};
 use crate::utils::vector_manipulation::extract_sublist;
+use colored::*;
 use serialport::SerialPort;
 use std::alloc::Global;
 use std::collections::HashMap;
@@ -20,7 +21,7 @@ const HEADER_BYTE: u8 = 19;
 // robot sensor packages wanted
 const NR_OF_SENSOR_PACKS_REQUESTED: u8 = 15_u8;
 const NR_OF_SENSOR_BYTES_RECIEVED: u8 = 39_u8;
-const SENSOR_BUFFER: [u8; 82] = [0u8; 82]; // size: 2 * (header + nbytes + sensor bytes)
+const SENSOR_BUFFER: [u8; 84] = [0u8; 84]; // size: 2 * (header + nbytes + sensor bytes)
 const SENSOR_PACKAGES_WANTED: [u8; 17] = [
     STREAM,
     NR_OF_SENSOR_PACKS_REQUESTED,
@@ -59,32 +60,27 @@ pub fn read_serial_stream(
     port.write_all(&write_buffer)
         .expect("Failed to write to serial port");
 
-    let mut _count = 1;
     loop {
         match port.read(&mut read_buffer) {
             Ok(bytes_recvd) => {
-                _count += 1;
-                println!("count: {}", _count);
                 println!("buffer size: {} bytes", bytes_recvd);
                 println!("buffer content: {:?}", &read_buffer);
                 let mut byte_data = read_buffer.to_vec();
 
-                if extract_sublist(&mut byte_data, [19, nbytes], 41, &mut checksum) {
-                    println!("Before sanitize and read: {:?}", byte_data);
+                if extract_sublist(&mut byte_data, [19, 39], 42, &mut checksum) {
+                    println!("{} {:?}", "Before sanitize and read:".green(), byte_data);
                     sanitize_and_read(&mut byte_data, nbytes, f);
                 } else {
-                    println!("corrupted buffer")
+                    port.flush().unwrap();
+                    let msg = "corrupted buffer".red();
+                    println!("{}", msg);
                 }
             }
             Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
             Err(e) => eprintln!("This is an error: {:?}", e),
         };
         port.flush().unwrap();
-        thread::sleep(Duration::from_millis(15));
-
-        if _count > 300 {
-            break;
-        }
+        thread::sleep(Duration::from_millis(20));
     }
     port
 }

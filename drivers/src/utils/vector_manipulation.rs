@@ -29,6 +29,7 @@ pub fn extract_sublist(
                 // double-check that size is right
                 assert_eq!(byte_data.len(), slice_size);
 
+                checksum.push_slice(&byte_data);
                 let checksum_low_byte = checksum.calculate_low_byte_sum();
                 checksum.reset();
                 return checksum_low_byte == 0;

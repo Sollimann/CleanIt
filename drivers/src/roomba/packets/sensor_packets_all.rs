@@ -1,75 +1,8 @@
 use crate::roomba::decode::*;
 use crate::utils::enums::{inspect, Value};
-use byteorder::{BigEndian, ByteOrder};
-use std::collections::hash_map::RandomState;
 use std::collections::HashMap;
-use std::io::{Cursor, Error, Read, Write};
-use std::time::Duration;
-use std::{io, thread};
 
-pub fn duplex() {
-    // Open the first serialport available
-    let port_name = &serialport::available_ports().expect("No serial port")[0].port_name;
-    let mut port = serialport::new(port_name, 115_200)
-        .open()
-        .expect("Failed to open serial port");
-
-    // set robot in mode
-    const START: u8 = 128_u8;
-    const PASSIVE_MODE: u8 = 128_u8;
-    const SAFE_MODE: u8 = 131_u8;
-    const FULL: u8 = 132_u8;
-    const STOP: u8 = 173_u8;
-
-    // Write a buffer into this writer, returning how many bytes were written.
-    // https://doc.rust-lang.org/nightly/std/io/trait.Write.html
-    port.flush().unwrap();
-    port.write(&[START]);
-    println!("Starting");
-    thread::sleep(Duration::from_millis(1000));
-    // println!("Setting mode");
-    // port.write(&[FULL]);
-    // thread::sleep(Duration::from_millis(1000));
-
-    // Clone the port
-    let mut clone = port.try_clone().expect("Failed to clone");
-
-    // send out 4 bytes every 15 ms
-    thread::spawn(move || loop {
-        clone.flush().unwrap();
-        thread::sleep(Duration::from_millis(2));
-        clone
-            .write_all(&[142, 3])
-            .expect("Failed to write to serial port");
-        thread::sleep(Duration::from_millis(2));
-        clone.flush().unwrap();
-        thread::sleep(Duration::from_millis(4));
-    });
-
-    // Read the response from the cloned port
-    let mut buffer = [0u8; 10];
-    let mut _count = 1;
-    loop {
-        thread::sleep(Duration::from_millis(10));
-        match port.read(&mut buffer) {
-            Ok(bytes_recvd) => {
-                _count += 1;
-                println!("count: {}", _count);
-                println!("buffer size: {} bytes", bytes_recvd);
-                println!("buffer content: {:?}", &buffer);
-                if bytes_recvd == buffer.len() {
-                    //decode_sensor_packets(buffer);
-                    decode_battery_packets(buffer)
-                }
-            }
-            Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
-            Err(e) => eprintln!("This is an error: {:?}", e),
-        }
-        port.flush().unwrap();
-    }
-}
-
-pub fn decode_sensor_packets(byte_data: [u8; 80]) {
+pub fn decode_all_sensor_packets(byte_data: [u8; 80]) {
     let mut sensor_data = HashMap::new();
 
     let mut vec = byte_data.to_vec();
@@ -293,73 +226,6 @@ pub fn decode_sensor_packets(byte_data: [u8; 80]) {
     sensor_data.insert(
         "wheel drop and bumps",
         Value::HashMap(decode_packet_7(vec.pop().unwrap())),
-    );
-
-    assert_eq!(vec.len(), 0);
-
-    for (key, value) in sensor_data {
-        println!("{}: {:?}", key, inspect(value));
-    }
-}
-
-pub fn decode_battery_packets(byte_data: [u8; 10]) {
-    let mut sensor_data = HashMap::new();
-
-    let mut vec = byte_data.to_vec();
-
-    //size 10, contains 21-26clone.flush().unwrap();
-    sensor_data.insert(
-        "battery capacity",
-        Value::Uint16(decode_packet_26(vec.pop().unwrap(), vec.pop().unwrap())),
-    );
-    sensor_data.insert(
-        "battery charge",
-        Value::Uint16(decode_packet_25(vec.pop().unwrap(), vec.pop().unwrap())),
-    );
-    sensor_data.insert(
-        "temperature",
-        Value::Int8(decode_packet_24(vec.pop().unwrap())),
-    );
-
-    sensor_data.insert(
-        "current",
-        Value::Int16(decode_packet_23(vec.pop().unwrap(), vec.pop().unwrap())),
-    );
-    sensor_data.insert(
-        "voltage",
-        Value::Uint16(decode_packet_22(vec.pop().unwrap(), vec.pop().unwrap())),
-    );
-    sensor_data.insert(
-        "charging state",
-        Value::Uint8(decode_packet_21(vec.pop().unwrap())),
-    );
-
-    for (key, value) in sensor_data {
-        println!("{}: {:?}", key, inspect(value));
-    }
-}
-pub fn decode_odom_packets(byte_data: [u8; 6]) {
-    let mut sensor_data = HashMap::new();
-
-    let mut vec = byte_data.to_vec();
-    assert_eq!(vec.len(), 6);
-    // size 6, contains 17-20
-    sensor_data.insert(
-        "angle",
-        Value::Int16(decode_packet_20(vec.pop().unwrap(), vec.pop().unwrap())),
-    );
-    sensor_data.insert(
-        "distance",
-        Value::Int16(decode_packet_19(vec.pop().unwrap(), vec.pop().unwrap())),
-    );
-    sensor_data.insert(
-        "buttons",
-        Value::HashMap(decode_packet_18(vec.pop().unwrap())),
-    );
-
-    sensor_data.insert(
-        "infrared char omni",
-        Value::Uint8(decode_packet_17(vec.pop().unwrap())),
     );
 
     assert_eq!(vec.len(), 0);

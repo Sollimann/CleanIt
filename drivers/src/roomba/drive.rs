@@ -1,28 +1,55 @@
-use crate::roomba::packets::example_packets::decode_example_packets;
 use crate::roomba::packets::sensor_packets::decode_sensor_packets;
-use crate::roomba::read_states::read_all_sensors;
 use crate::roomba::serial_stream::read_serial_stream;
 use crate::roomba::startup::{shutdown, startup};
+use byteorder::{BigEndian, WriteBytesExt};
+use serialport::SerialPort;
+use std::alloc::Global;
 use std::thread;
 use std::time::Duration;
 
-pub fn drive() {
-    const DOCK: u8 = 143_u8;
+fn drive(velocity: i16, radius: i16, mut port: Box<dyn SerialPort>) {
+    let mut drive_commands: Vec<u8> = vec![137];
+    drive_commands.write_i16::<BigEndian>(velocity).unwrap();
+    drive_commands.write_i16::<BigEndian>(radius).unwrap();
 
+    if let Err(e) = port.write(&drive_commands) {
+        println!("writing drive commands failed due to error: {:?}", e)
+    }
+}
+
+fn drive_direct(
+    left_velocity: i16,
+    right_velocity: i16,
+    mut port: Box<dyn SerialPort>,
+) -> Box<dyn SerialPort, Global> {
+    let mut drive_commands: Vec<u8> = vec![145];
+    drive_commands
+        .write_i16::<BigEndian>(right_velocity)
+        .unwrap();
+    drive_commands
+        .write_i16::<BigEndian>(left_velocity)
+        .unwrap();
+
+    if let Err(e) = port.write(&drive_commands) {
+        println!("writing drive direct commands failed due to error: {:?}", e)
+    }
+    port
+}
+
+pub fn drive_and_sense() {
     let mut port = startup();
 
-    // drive forward for 0.5 sec
-    let drive = [137, 255, 56, 1, 244];
-    let drive_direct = [145, 0, 20, 0, 20];
-    let stop = [145, 0, 0, 0, 0];
-    port.write(&drive_direct);
-    thread::sleep(Duration::from_millis(15));
-    //port = read_all_sensors(port);
-    port = read_serial_stream(port, decode_sensor_packets);
-    //thread::sleep(Duration::from_millis(6000));
-    port.write(&stop);
-    thread::sleep(Duration::from_millis(4000));
-    //port.write(&[DOCK]);
-    //thread::sleep(Duration::from_millis(2000));
+    let clone = port.try_clone().expect("Failed to clone");
+
+    // read sensor values in one thread
+    thread::spawn(|| {
+        read_serial_stream(clone, decode_sensor_packets); // 50hz
+    });
+
+    // drive the roomba in main thread
+    port = drive_direct(40, 40, port);
+    thread::sleep(Duration::from_millis(5000));
+    port = drive_direct(0, 0, port);
+    thread::sleep(Duration::from_millis(1000));
     shutdown(port);
 }
