@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use serialport::SerialPort;
 use std::alloc::Global;
 use std::thread;

@@ -1,8 +1,7 @@
 pub mod decode;
 pub mod drive;
-pub mod duplex;
-pub mod mode;
-pub mod read_states;
-pub mod reading;
+pub mod examples;
+pub mod packets;
+pub mod ports;
 pub mod serial_stream;
 pub mod startup;
