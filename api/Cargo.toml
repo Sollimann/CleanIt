@@ -22,3 +22,9 @@ rand = "0.7"
 
 [build-dependencies]
 tonic-build = "0.4"
+
+# Binary targets are executables programs that can be run after being compiled.
+# The default binary filename is src/main.rs
+[[bin]]
+name = "server"
+path = "src/server.rs"
