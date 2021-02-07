@@ -8,7 +8,7 @@ package roombasensors;
 service RoombaSensors {
   // Accepts a stream of Points on a route being traversed, returning a
   // RouteSummary when traversal is completed.
-  rpc RecordRoute(stream Sensors) returns (SensorsReceived) {}
+  rpc SendSensors(stream Sensors) returns (SensorsReceived) {}
 }
 
 
