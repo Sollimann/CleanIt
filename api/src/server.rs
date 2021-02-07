@@ -12,16 +12,15 @@ use tonic::transport::Server;
 use tonic::{Request, Response, Status};
 
 // our messages and services
+pub mod roombasensors {
+    tonic::include_proto!("roombasensors");
+}
 use roombasensors::roomba_sensors_server::{RoombaSensors, RoombaSensorsServer};
 use roombasensors::{LightBumper, SensorRequest, Sensors, SensorsReceived, Stasis};
 
 // defining a struct for our service
 #[derive(Debug)]
 pub struct RoombaSensorsService;
-
-pub mod roombasensors {
-    tonic::include_proto!("roombasensors");
-}
 
 // implementing rpc for service defined in .proto
 #[tonic::async_trait]

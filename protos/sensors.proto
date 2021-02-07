@@ -1,14 +1,17 @@
 // Version of protocol buffer used
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 // Package name for the buffer will be used later
 package roombasensors;
 
 // interface exported by the server
 service RoombaSensors {
-  // Accepts a stream of Points on a route being traversed, returning a
-  // RouteSummary when traversal is completed.
-  rpc SendSensors(stream Sensors) returns (SensorsReceived) {}
+  // A client-side streaming RPC where the client writes a sequence of sensors
+  // and sends them to the server. Once the client has finished writing the messages,
+  // it waits for the server to read them all and return its response.
+  rpc SendSensorStream(stream Sensors) returns (SensorsReceived);
 }
 
 
@@ -46,4 +49,9 @@ message LightBumper {
 
 message SensorsReceived {
   bool status = 1;
+  uint64 packet_count = 2;
+}
+
+message SensorRequest {
+  uint64 timestamp= 1;
 }
