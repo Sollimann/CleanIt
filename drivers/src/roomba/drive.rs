@@ -3,11 +3,10 @@ use crate::roomba::serial_stream::read_serial_stream;
 use crate::roomba::startup::{shutdown, startup};
 use byteorder::{BigEndian, WriteBytesExt};
 use serialport::SerialPort;
-use std::alloc::Global;
 use std::thread;
 use std::time::Duration;
 
-fn drive(velocity: i16, radius: i16, mut port: Box<dyn SerialPort>) -> Box<dyn SerialPort, Global> {
+fn drive(velocity: i16, radius: i16, mut port: Box<dyn SerialPort>) -> Box<dyn SerialPort> {
     let mut drive_commands: Vec<u8> = vec![137];
     drive_commands.write_i16::<BigEndian>(velocity).unwrap();
     drive_commands.write_i16::<BigEndian>(radius).unwrap();
@@ -22,7 +21,7 @@ fn drive_direct(
     left_velocity: i16,
     right_velocity: i16,
     mut port: Box<dyn SerialPort>,
-) -> Box<dyn SerialPort, Global> {
+) -> Box<dyn SerialPort> {
     let mut drive_commands: Vec<u8> = vec![145];
     drive_commands
         .write_i16::<BigEndian>(right_velocity)
