@@ -1,5 +1,3 @@
-#![feature(generator_trait)]
-
 pub mod roomba;
 pub mod utils;
 
