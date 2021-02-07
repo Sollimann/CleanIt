@@ -81,6 +81,9 @@ pub fn yield_sensor_stream(
                             Some(sensor_readings) => yield sensor_readings,
                             None => println!("sanitizing failed")
                         }
+                        port.flush().unwrap();
+                        let msg = "OK!".green();
+                        println!("{}", msg);
                     } else {
                         port.flush().unwrap();
                         let msg = "corrupted buffer".red();
@@ -155,26 +158,21 @@ pub fn sanitize_and_read(
 }
 
 fn sanitize(byte_data: &mut Vec<u8>, nbytes: u8) -> bool {
-    println!("byte_data before sanitize: {:?}", byte_data);
-
     let header = byte_data.remove(0);
     let n = byte_data.remove(0);
 
     // remove header
     if header != HEADER_BYTE {
-        println!("{} != header byte", header);
         return false;
     }
 
     // remove nbytes
     if n != nbytes {
-        println!("{} != nbytes", n);
         return false;
     }
 
     // remove checksum
     byte_data.pop();
 
-    println!("byte_data after sanitize: {:?}", byte_data);
     true
 }
