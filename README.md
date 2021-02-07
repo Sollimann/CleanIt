@@ -1,5 +1,13 @@
 <h1 align="center">CleanIt</h1>
 
+[![Build Status](https://github.com/Sollimann/CleanIt/workflows/CleanIt/badge.svg)](https://github.com/Sollimann/CleanIt/actions)
+[![version](https://img.shields.io/badge/version-1.0.0-blue)](https://GitHub.com/Sollimann/CleanIt/releases/)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Sollimann/CleanIt/graphs/commit-activity)
+[![GitHub pull-requests](https://img.shields.io/github/issues-pr/Sollimann/CleanIt.svg)](https://GitHub.com/Sollimann/CleanIt/pulls)
+[![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed/Sollimann/d-star-lite.svg)](https://GitHub.com/Sollimann/CleanIt/pulls)
+![ViewCount](https://views.whatilearened.today/views/github/Sollimann/CleanIt.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 <p align="center">
     <em>Open-source Autonomy Software in Rust-lang with gRPC for the Roomba series robot vacuum cleaners</em>
 </p>
