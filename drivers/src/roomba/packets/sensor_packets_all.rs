@@ -230,7 +230,7 @@ pub fn decode_all_sensor_packets(byte_data: [u8; 80]) {
 
     assert_eq!(vec.len(), 0);
 
-    for (key, value) in sensor_data {
-        println!("{}: {:?}", key, inspect(value));
+    for (key, value) in &sensor_data {
+        println!("{}: {:?}", key, inspect(&value));
     }
 }

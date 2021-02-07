@@ -11,7 +11,9 @@ serialport = "4.0.0"
 byteorder = "1.4.2"
 hex = "0.4.2"
 parse_int = "0.5.0"
-rug = "1.11.0"
-bitreader = "0.3.2"
 colored = "2.0.0"
-
+async-stream = "0.3.0"
+futures-core = "0.3.12"
+futures-util = "0.3.12"
+tokio = { version = "1.0", features = ["rt-multi-thread", "macros", "sync", "time"] }
+async-std = "1.9.0"

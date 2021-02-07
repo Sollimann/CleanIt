@@ -1,7 +1,10 @@
 use crate::roomba::packets::sensor_packets::decode_sensor_packets;
-use crate::roomba::serial_stream::read_serial_stream;
+use crate::roomba::serial_stream::{read_serial_stream, yield_sensor_stream};
 use crate::roomba::startup::{shutdown, startup};
+use async_std::{fs::File, io, prelude::*, task};
 use byteorder::{BigEndian, WriteBytesExt};
+use futures_util::pin_mut;
+use futures_util::stream::StreamExt;
 use serialport::SerialPort;
 use std::thread;
 use std::time::Duration;
@@ -36,14 +39,21 @@ fn drive_direct(
     port
 }
 
-pub fn drive_and_sense() {
+#[tokio::main]
+pub async fn drive_and_sense() {
     let mut port = startup();
 
     let clone = port.try_clone().expect("Failed to clone");
 
     // read sensor values in one thread
-    thread::spawn(|| {
-        read_serial_stream(clone, decode_sensor_packets); // 50hz
+    task::spawn(async {
+        //read_serial_stream(clone, decode_sensor_packets); // 50hz
+        let sensor_reading = yield_sensor_stream(clone, decode_sensor_packets);
+        pin_mut!(sensor_reading); // needed for iteration
+
+        while let Some(value) = sensor_reading.next().await {
+            println!("got {:?}", value);
+        }
     });
 
     // drive the roomba in main thread

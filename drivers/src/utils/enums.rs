@@ -11,7 +11,7 @@ pub enum Value {
     HashMap(HashMap<String, u8>),
 }
 
-pub fn inspect(value: Value) -> String {
+pub fn inspect(value: &Value) -> String {
     match value {
         Value::Str(v) => {
             format!("{}", v)

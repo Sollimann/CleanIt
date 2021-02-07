@@ -34,7 +34,7 @@ pub fn decode_battery_packets(byte_data: [u8; 10]) {
         Value::Uint8(decode_packet_21(vec.pop().unwrap())),
     );
 
-    for (key, value) in sensor_data {
-        println!("{}: {:?}", key, inspect(value));
+    for (key, value) in &sensor_data {
+        println!("{}: {:?}", key, inspect(&value));
     }
 }
