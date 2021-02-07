@@ -1,5 +1,3 @@
-#![feature(allocator_api)]
-
 pub mod roomba;
 pub mod utils;
 
