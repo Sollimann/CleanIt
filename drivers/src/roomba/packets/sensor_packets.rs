@@ -4,10 +4,9 @@ use crate::roomba::decode::{
     decode_packet_42, decode_packet_43, decode_packet_44, decode_packet_45, decode_packet_58,
 };
 use crate::utils::enums::{inspect, Value};
-use std::alloc::Global;
 use std::collections::HashMap;
 
-pub fn decode_sensor_packets(byte_data: &mut Vec<u8, Global>) {
+pub fn decode_sensor_packets(byte_data: &mut Vec<u8>) {
     let mut sensor_data = HashMap::new();
 
     if byte_data.remove(0) == 13 {

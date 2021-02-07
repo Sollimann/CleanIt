@@ -1,8 +1,7 @@
 use crate::utils::checksum::Checksum;
-use std::alloc::Global;
 
 pub fn extract_sublist(
-    byte_data: &mut Vec<u8, Global>,
+    byte_data: &mut Vec<u8>,
     seq: [u8; 2],
     slice_size: usize,
     checksum: &mut Checksum,

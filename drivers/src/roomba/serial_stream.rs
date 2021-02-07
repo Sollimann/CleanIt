@@ -4,8 +4,6 @@ use crate::utils::enums::{inspect, Value};
 use crate::utils::vector_manipulation::extract_sublist;
 use colored::*;
 use serialport::SerialPort;
-use std::alloc::Global;
-use std::collections::HashMap;
 use std::time::Duration;
 use std::{io, thread};
 
@@ -43,9 +41,9 @@ const SENSOR_PACKAGES_WANTED: [u8; 17] = [
 ];
 
 pub fn read_serial_stream(
-    mut port: Box<dyn SerialPort, Global>,
-    f: fn(&mut Vec<u8, Global>) -> (),
-) -> Box<dyn SerialPort, Global> {
+    mut port: Box<dyn SerialPort>,
+    f: fn(&mut Vec<u8>) -> (),
+) -> Box<dyn SerialPort> {
     let write_buffer = SENSOR_PACKAGES_WANTED;
 
     // let the buffer size be twice the expected size
@@ -85,11 +83,7 @@ pub fn read_serial_stream(
     port
 }
 
-pub fn sanitize_and_read(
-    byte_data: &mut Vec<u8, Global>,
-    nbytes: u8,
-    f: fn(&mut Vec<u8, Global>) -> (),
-) {
+pub fn sanitize_and_read(byte_data: &mut Vec<u8>, nbytes: u8, f: fn(&mut Vec<u8>) -> ()) {
     let sanitize_ok = sanitize(byte_data, nbytes);
 
     if sanitize_ok {
@@ -100,7 +94,7 @@ pub fn sanitize_and_read(
     }
 }
 
-fn sanitize(byte_data: &mut Vec<u8, Global>, nbytes: u8) -> bool {
+fn sanitize(byte_data: &mut Vec<u8>, nbytes: u8) -> bool {
     println!("byte_data before sanitize: {:?}", byte_data);
 
     let header = byte_data.remove(0);
