@@ -7,7 +7,7 @@ use std::alloc::Global;
 use std::thread;
 use std::time::Duration;
 
-fn drive(velocity: i16, radius: i16, mut port: Box<dyn SerialPort>) {
+fn drive(velocity: i16, radius: i16, mut port: Box<dyn SerialPort>) -> Box<dyn SerialPort, Global> {
     let mut drive_commands: Vec<u8> = vec![137];
     drive_commands.write_i16::<BigEndian>(velocity).unwrap();
     drive_commands.write_i16::<BigEndian>(radius).unwrap();
@@ -15,6 +15,7 @@ fn drive(velocity: i16, radius: i16, mut port: Box<dyn SerialPort>) {
     if let Err(e) = port.write(&drive_commands) {
         println!("writing drive commands failed due to error: {:?}", e)
     }
+    port
 }
 
 fn drive_direct(
@@ -47,7 +48,8 @@ pub fn drive_and_sense() {
     });
 
     // drive the roomba in main thread
-    port = drive_direct(40, 40, port);
+    //port = drive(100, 200, port);
+    port = drive_direct(55, 55, port);
     thread::sleep(Duration::from_millis(5000));
     port = drive_direct(0, 0, port);
     thread::sleep(Duration::from_millis(1000));

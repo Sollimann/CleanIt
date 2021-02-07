@@ -1,0 +1,49 @@
+// Version of protocol buffer used
+syntax = "proto3";
+
+// Package name for the buffer will be used later
+package roombasensors;
+
+// interface exported by the server
+service RoombaSensors {
+  // Accepts a stream of Points on a route being traversed, returning a
+  // RouteSummary when traversal is completed.
+  rpc RecordRoute(stream Sensors) returns (SensorsReceived) {}
+}
+
+
+message Sensors {
+  bool virtual_wall = 1;
+  uint32 charging_state = 2;
+  uint32 voltage = 3;
+  int32 temperature = 4;
+  uint32 battery_charge = 5;
+  uint32 battery_capacity = 6;
+  uint32 oi_mode = 7;
+  int32 requested_velocity = 8;
+  int32 requested_radius = 9;
+  int32 requested_right_velocity = 10;
+  int32 requested_left_velocity = 11;
+  uint32 left_encoder_counts = 12;
+  uint32 right_encoder_counts = 13;
+  LightBumper light_bumper = 14;
+  Stasis stasis = 15;
+}
+
+message Stasis {
+  uint32 toggling = 1;
+  uint32 disabled = 2;
+}
+
+message LightBumper {
+  bool bumper_left = 1;
+  bool bumper_front_left = 2;
+  bool bumper_center_left = 3;
+  bool bumper_center_right = 4;
+  bool bumper_front_right = 5;
+  bool bumper_right = 6;
+}
+
+message SensorsReceived {
+  bool status = 1;
+}
