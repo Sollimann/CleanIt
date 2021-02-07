@@ -21,7 +21,7 @@ pub mod roombasensors {
 
 #[tonic::async_trait]
 impl RoombaSensors for RoombaSensorsService {
-    async fn send_sensors(
+    async fn send_sensor_stream(
         &self,
         _request: Request<tonic::Streaming<Sensors>>,
     ) -> Result<Response<SensorsReceived>, Status> {
