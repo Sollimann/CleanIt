@@ -32,6 +32,7 @@ Motivation is to build a complete DIY autonomy software from scratch (motion pla
  |   └── rplidar
  |   └── raspberryPi
  └── proto
+ |   └── sensors.proto
  |   └── state.proto
  |   └── map2D.proto
  └── visualization (bin)

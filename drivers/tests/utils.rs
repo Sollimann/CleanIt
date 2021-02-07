@@ -31,6 +31,22 @@ fn test_write_decimal_to_buffer() {
 }
 
 #[test]
+fn test_drive_direct() {
+    let right_velocity = -200;
+    let left_velocity = 500;
+
+    let mut drive_commands: Vec<u8> = vec![145];
+    drive_commands
+        .write_i16::<BigEndian>(right_velocity)
+        .unwrap();
+    drive_commands
+        .write_i16::<BigEndian>(left_velocity)
+        .unwrap();
+
+    assert_eq!(drive_commands, vec![145, 255, 56, 1, 244]);
+}
+
+#[test]
 fn calculate_checksum_256() {
     let buffer_output: [u8; 8] = [19, 5, 29, 2, 25, 13, 0, 163];
 

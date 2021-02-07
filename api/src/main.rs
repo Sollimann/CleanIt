@@ -1,3 +1,6 @@
+mod client;
+mod server;
+
 use drivers::roomba::drive;
 
 fn main() {
