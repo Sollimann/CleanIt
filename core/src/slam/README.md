@@ -1,0 +1,1 @@
+![original image](https://cdn.mathpix.com/snip/images/NB754kxUpPzOwBIVA_G9uaTkHPrCxRY_FeAu-vS1Vs4.original.fullsize.png)
