@@ -7,6 +7,7 @@
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Sollimann/CleanIt/graphs/commit-activity)
 [![GitHub pull-requests](https://img.shields.io/github/issues-pr/Sollimann/CleanIt.svg)](https://GitHub.com/Sollimann/CleanIt/pulls)
 [![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed/Sollimann/CleanIt.svg)](https://GitHub.com/Sollimann/CleanIt/pulls)
+
 ![ViewCount](https://views.whatilearened.today/views/github/Sollimann/CleanIt.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -22,9 +23,13 @@
 
 Motivation is to build a complete DIY autonomy software from scratch (motion planning, guidance and motion control, SLAM, mission control, 2D/3D visualization etc..) with a real-time client-server communication stream using async gRPC for intercommunication and distributed compute.
 
- ## Structure
+## Contributions are welcome!
+
+Would you like to contribute with work and/or ideas, feel free to check out the [Project Backlog](https://github.com/Sollimann/CleanIt/projects/1)
+
+## Structure
  
- #### Project Layout
+#### Project Layout
  ```bash
  ├── Cargo.toml (workspace)
  ├── Cargo.lock
