@@ -35,17 +35,36 @@ an error model for odometric accuracy and see how the errors propagate over time
 
 ![Coordinate frames](../../docs/coordinate_frame.png)
 
-
+### **Step.1 : Calculate the pose**
 Generally the pose (position) of a robot is represented by the vector: 
-
-pose
 
 <img src="https://latex.codecogs.com/gif.latex?\bg_white&space;p=\left[\begin{array}{l}&space;x&space;\\&space;y&space;\\&space;\theta&space;\end{array}\right]" title="p=\left[\begin{array}{l} x \\ y \\ \theta \end{array}\right]" />
 
-break
+For a differential-drive robot the position can be estimated starting from a known position by integrating the movement
+(summing the incremental travel distances). For a discrete system with a fixed sampling interval *Δt* the incremental travel
+distances (*Δx*, *Δy*, *Δθ*) are:
 
 <img src="https://latex.codecogs.com/gif.latex?\bg_white&space;\begin{array}{l}&space;\Delta&space;x=\Delta&space;s&space;\cos&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;y=\Delta&space;s&space;\sin&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;\theta=\frac{\Delta&space;s_{r}-\Delta&space;s_{l}}{b}&space;\\&space;\Delta&space;s=\frac{\Delta&space;s_{r}&plus;\Delta&space;s_{l}}{2}&space;\end{array}" title="\begin{array}{l} \Delta x=\Delta s \cos (\theta+\Delta \theta / 2) \\ \Delta y=\Delta s \sin (\theta+\Delta \theta / 2) \\ \Delta \theta=\frac{\Delta s_{r}-\Delta s_{l}}{b} \\ \Delta s=\frac{\Delta s_{r}+\Delta s_{l}}{2} \end{array}" />
 
-break
+where:
+
+(*Δx*; *Δy*; *Δθ*) = path traveled in the last sampling interval.
+*Δs_l*; *Δs_r*) = traveled distances for the right and left wheel respectively.
+*b* = distance between the two wheels of differential-drive robot
+
+thus we get the updated position *p'*:
 
 <img src="https://latex.codecogs.com/gif.latex?\bg_white&space;p^{\prime}=\left[\begin{array}{l}&space;x^{\prime}&space;\\&space;y^{\prime}&space;\\&space;\theta^{\prime}&space;\end{array}\right]=p&plus;\left[\begin{array}{c}&space;\Delta&space;s&space;\cos&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;s&space;\sin&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;\theta&space;\end{array}\right]=\left[\begin{array}{l}&space;x&space;\\&space;y&space;\\&space;\theta&space;\end{array}\right]&plus;\left[\begin{array}{c}&space;\Delta&space;s&space;\cos&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;s&space;\sin&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;\theta&space;\end{array}\right]" title="p^{\prime}=\left[\begin{array}{l} x^{\prime} \\ y^{\prime} \\ \theta^{\prime} \end{array}\right]=p+\left[\begin{array}{c} \Delta s \cos (\theta+\Delta \theta / 2) \\ \Delta s \sin (\theta+\Delta \theta / 2) \\ \Delta \theta \end{array}\right]=\left[\begin{array}{l} x \\ y \\ \theta \end{array}\right]+\left[\begin{array}{c} \Delta s \cos (\theta+\Delta \theta / 2) \\ \Delta s \sin (\theta+\Delta \theta / 2) \\ \Delta \theta \end{array}\right]" />
+
+### **Step.2 : Calculate the error model**
+
+The odometric position updates can give only a very rough estimate of the actual position. Owing to integration errors of the
+uncertainties of *p* and the motion errors during the incremental motion (*Δs_l*; *Δs_r*) the position error based on odometry
+grows with time
+
+We have to establish an error model for the integrated position *p'* to obtain a *covariance matrix, Σ_p*, od the odometric
+position estimate. To do so, we assume that the starting point of the initial covariance matrix *Σ_p* is known. For the motion
+increment (*Δs_l*; *Δs_r*) we assume the following *covariance matrix, Σ_Δ*:
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=\Sigma_{\Delta}=\operatorname{covar}\left(\Delta&space;s_{r},&space;\Delta&space;s_{l}\right)=\left[\begin{array}{cc}&space;k_{r}\left|\Delta&space;s_{r}\right|&space;&&space;0&space;\\&space;0&space;&&space;k_{l}&space;\mid&space;\Delta&space;s_{l}&space;\end{array}\right]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\Sigma_{\Delta}=\operatorname{covar}\left(\Delta&space;s_{r},&space;\Delta&space;s_{l}\right)=\left[\begin{array}{cc}&space;k_{r}\left|\Delta&space;s_{r}\right|&space;&&space;0&space;\\&space;0&space;&&space;k_{l}&space;\mid&space;\Delta&space;s_{l}&space;\end{array}\right]" title="\Sigma_{\Delta}=\operatorname{covar}\left(\Delta s_{r}, \Delta s_{l}\right)=\left[\begin{array}{cc} k_{r}\left|\Delta s_{r}\right| & 0 \\ 0 & k_{l} \mid \Delta s_{l} \end{array}\right]" /></a>
+
