@@ -38,9 +38,14 @@ an error model for odometric accuracy and see how the errors propagate over time
 
 Generally the pose (position) of a robot is represented by the vector: 
 
-![original image](https://cdn.mathpix.com/snip/images/WBWmX_92HrdjnxAjwecIMZcWjh1xndC3zy5RJ_4RBPc.original.fullsize.png)
+pose
 
+<img src="https://latex.codecogs.com/gif.latex?\bg_white&space;p=\left[\begin{array}{l}&space;x&space;\\&space;y&space;\\&space;\theta&space;\end{array}\right]" title="p=\left[\begin{array}{l} x \\ y \\ \theta \end{array}\right]" />
 
+break
 
-![original image](https://cdn.mathpix.com/snip/images/NB754kxUpPzOwBIVA_G9uaTkHPrCxRY_FeAu-vS1Vs4.original.fullsize.png)
+<img src="https://latex.codecogs.com/gif.latex?\bg_white&space;\begin{array}{l}&space;\Delta&space;x=\Delta&space;s&space;\cos&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;y=\Delta&space;s&space;\sin&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;\theta=\frac{\Delta&space;s_{r}-\Delta&space;s_{l}}{b}&space;\\&space;\Delta&space;s=\frac{\Delta&space;s_{r}&plus;\Delta&space;s_{l}}{2}&space;\end{array}" title="\begin{array}{l} \Delta x=\Delta s \cos (\theta+\Delta \theta / 2) \\ \Delta y=\Delta s \sin (\theta+\Delta \theta / 2) \\ \Delta \theta=\frac{\Delta s_{r}-\Delta s_{l}}{b} \\ \Delta s=\frac{\Delta s_{r}+\Delta s_{l}}{2} \end{array}" />
 
+break
+
+<img src="https://latex.codecogs.com/gif.latex?\bg_white&space;p^{\prime}=\left[\begin{array}{l}&space;x^{\prime}&space;\\&space;y^{\prime}&space;\\&space;\theta^{\prime}&space;\end{array}\right]=p&plus;\left[\begin{array}{c}&space;\Delta&space;s&space;\cos&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;s&space;\sin&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;\theta&space;\end{array}\right]=\left[\begin{array}{l}&space;x&space;\\&space;y&space;\\&space;\theta&space;\end{array}\right]&plus;\left[\begin{array}{c}&space;\Delta&space;s&space;\cos&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;s&space;\sin&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;\Delta&space;\theta&space;\end{array}\right]" title="p^{\prime}=\left[\begin{array}{l} x^{\prime} \\ y^{\prime} \\ \theta^{\prime} \end{array}\right]=p+\left[\begin{array}{c} \Delta s \cos (\theta+\Delta \theta / 2) \\ \Delta s \sin (\theta+\Delta \theta / 2) \\ \Delta \theta \end{array}\right]=\left[\begin{array}{l} x \\ y \\ \theta \end{array}\right]+\left[\begin{array}{c} \Delta s \cos (\theta+\Delta \theta / 2) \\ \Delta s \sin (\theta+\Delta \theta / 2) \\ \Delta \theta \end{array}\right]" />
