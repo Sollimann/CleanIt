@@ -49,7 +49,7 @@ distances (*Δx*, *Δy*, *Δθ*) are:
 where:
 
 (*Δx*; *Δy*; *Δθ*) = path traveled in the last sampling interval.
-*Δs_l*; *Δs_r*) = traveled distances for the right and left wheel respectively.
+(*Δs_r*; *Δs_l*) = traveled distances for the right and left wheel respectively.
 *b* = distance between the two wheels of differential-drive robot
 
 thus we get the updated position *p'*:
@@ -64,6 +64,45 @@ grows with time
 
 We have to establish an error model for the integrated position *p'* to obtain a *covariance matrix, Σ_p*, od the odometric
 position estimate. To do so, we assume that the starting point of the initial covariance matrix *Σ_p* is known. For the motion
-increment (*Δs_l*; *Δs_r*) we assume the following *covariance matrix, Σ_Δ*:
+increment (*Δs_r*; *Δs_l*) we assume the following *covariance matrix, Σ_Δ*:
 
 <img src="https://latex.codecogs.com/gif.latex?\Sigma_{\Delta}=\operatorname{covar}\left(\Delta&space;s_{r},&space;\Delta&space;s_{l}\right)=\left[\begin{array}{cc}&space;k_{r}\left|\Delta&space;s_{r}\right|&space;&&space;0&space;\\&space;0&space;&&space;k_{l}&space;\mid&space;\Delta&space;s_{l}&space;\end{array}\right]" title="\Sigma_{\Delta}=\operatorname{covar}\left(\Delta s_{r}, \Delta s_{l}\right)=\left[\begin{array}{cc} k_{r}\left|\Delta s_{r}\right| & 0 \\ 0 & k_{l} \mid \Delta s_{l} \end{array}\right]" />
+
+where (*Δs_r*; *Δs_l*) are distances traveled by each wheel, and *k_r* and *k_l* are error contants representing the *nondeterministic*
+parameters of the motor drive and the wheel-floor interaction. For this covariance estimate, the following assumptions have been made:
+
+* The two errors of the individually driven wheels are independent.
+* The variance of the errors (left and right wheels) are proportional to the absolute value of the traveled distances (*Δs_l*; *Δs_r*).
+
+These assumptions, while not perfect, are suitable and will thus be used for the further development of the error model.
+The *motion errors / velocity errors* are due to imprecise movement because of the deformation of wheel, slippage, unequal floor, errors in encoders,
+and so on. The values for the errors konstant *k_r* and *k_l* depend on the robot and the environment and should be exprerimentally established
+by performing and analyzing representative movements.
+
+Assuming that *p* and *Δ_rl* = (*Δs_r*; *Δs_l*) are uncorrelated and the derivation of *p' = f(x,y,θ, Δs_r, Δs_l)* is reasonably
+approximated by the first-order Taylor expansion (linearization) of *f*, it can be concluded, using the *error propagation law*:
+
+<img src="https://latex.codecogs.com/gif.latex?C_{Y}=F_{X}&space;C_{X}&space;F_{X}^{T}" title="C_{Y}=F_{X} C_{X} F_{X}^{T}" />
+
+where:
+* *C_x* = covariance matrix representing the input uncertainties
+* *C_y* = covariance matrix representing the propagated uncertainties for the outputs
+* *F_x* = is the *Jacobian* matrix of the vehicle pose model *f*
+
+Giving us the pose covariance estimate:
+
+<img src="https://latex.codecogs.com/gif.latex?\Sigma_{p^{\prime}}=\nabla_{p}&space;f&space;\cdot&space;\Sigma_{p}&space;\cdot&space;\nabla_{p}&space;f^{T}&plus;\nabla_{\Delta_{r&space;l}}&space;f&space;\cdot&space;\Sigma_{\Delta}&space;\cdot&space;\nabla_{\Delta_{r&space;l}}&space;f^{T}" title="\Sigma_{p^{\prime}}=\nabla_{p} f \cdot \Sigma_{p} \cdot \nabla_{p} f^{T}+\nabla_{\Delta_{r l}} f \cdot \Sigma_{\Delta} \cdot \nabla_{\Delta_{r l}} f^{T}" />
+
+The covariance matrix *Σ_p* is, of course, always given by the *Σ_p'* of the previous step and can thus be calculated after
+specifying an initial value (e.g, 0)
+
+where:
+
+<img src="https://latex.codecogs.com/gif.latex?F_{p}=\nabla_{p}&space;f=\nabla_{p}\left(f^{T}\right)=\left[\frac{\partial&space;f}{\partial&space;x}&space;\frac{\partial&space;f}{\partial&space;y}&space;\frac{\partial&space;f}{\partial&space;\theta}\right]=\left[\begin{array}{ccc}&space;1&space;&&space;0&space;&&space;-\Delta&space;s&space;\sin&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;0&space;&&space;1&space;&&space;\Delta&space;s&space;\cos&space;(\theta&plus;\Delta&space;\theta&space;/&space;2)&space;\\&space;0&space;&&space;0&space;&&space;1&space;\end{array}\right]" title="F_{p}=\nabla_{p} f=\nabla_{p}\left(f^{T}\right)=\left[\frac{\partial f}{\partial x} \frac{\partial f}{\partial y} \frac{\partial f}{\partial \theta}\right]=\left[\begin{array}{ccc} 1 & 0 & -\Delta s \sin (\theta+\Delta \theta / 2) \\ 0 & 1 & \Delta s \cos (\theta+\Delta \theta / 2) \\ 0 & 0 & 1 \end{array}\right]" />
+
+<img src="https://latex.codecogs.com/gif.latex?F_{\Delta_{r&space;l}}=&space;\begin{bmatrix}&space;\frac{1}{2}&space;\cos&space;\left(\theta&plus;\frac{\Delta&space;\theta}{2}\right)-\frac{\Delta&space;s}{2&space;b}&space;\sin&space;\left(\theta&plus;\frac{\Delta&space;\theta}{2}\right)&space;&&space;\frac{1}{2}&space;\cos&space;\left(\theta&plus;\frac{\Delta&space;\theta}{2}\right)&plus;\frac{\Delta&space;s}{2&space;b}&space;\sin&space;\left(\theta&plus;\frac{\Delta&space;\theta}{2}\right)\\&space;\frac{1}{2}&space;\sin&space;\left(\theta&plus;\frac{\Delta&space;\theta}{2}\right)&plus;\frac{\Delta&space;s}{2&space;b}&space;\cos&space;\left(\theta&plus;\frac{\Delta&space;\theta}{2}\right)&space;&&space;\frac{1}{2}&space;\sin&space;\left(\theta&plus;\frac{\Delta&space;\theta}{2}\right)-\frac{\Delta&space;s}{2&space;b}&space;\cos&space;\left(\theta&plus;\frac{\Delta&space;\theta}{2}\right)&space;\\&space;\frac{1}{b}&space;&&space;-&space;\frac{1}{b}&space;\end{bmatrix}" title="F_{\Delta_{r l}}= \begin{bmatrix} \frac{1}{2} \cos \left(\theta+\frac{\Delta \theta}{2}\right)-\frac{\Delta s}{2 b} \sin \left(\theta+\frac{\Delta \theta}{2}\right) & \frac{1}{2} \cos \left(\theta+\frac{\Delta \theta}{2}\right)+\frac{\Delta s}{2 b} \sin \left(\theta+\frac{\Delta \theta}{2}\right)\\ \frac{1}{2} \sin \left(\theta+\frac{\Delta \theta}{2}\right)+\frac{\Delta s}{2 b} \cos \left(\theta+\frac{\Delta \theta}{2}\right) & \frac{1}{2} \sin \left(\theta+\frac{\Delta \theta}{2}\right)-\frac{\Delta s}{2 b} \cos \left(\theta+\frac{\Delta \theta}{2}\right) \\ \frac{1}{b} & - \frac{1}{b} \end{bmatrix}" />
+
+and with:
+
+<img src="https://latex.codecogs.com/gif.latex?\Delta&space;s=\frac{\Delta&space;s_{r}&plus;\Delta&space;s_{l}}{2}&space;;&space;\quad&space;\Delta&space;\theta=\frac{\Delta&space;s_{r}-\Delta&space;s_{l}}{b}" title="\Delta s=\frac{\Delta s_{r}+\Delta s_{l}}{2} ; \quad \Delta \theta=\frac{\Delta s_{r}-\Delta s_{l}}{b}" />
+
