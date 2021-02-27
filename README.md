@@ -25,7 +25,7 @@ Motivation is to build a complete DIY autonomy software from scratch (motion pla
 
 ## Contributions are welcome!
 
-Would you like to contribute with work and/or ideas, feel free to check out the [Project Backlog](https://github.com/Sollimann/CleanIt/projects/1)
+Would you like to contribute with work and/or ideas, feel free to check out the [Project Backlog](https://github.com/Sollimann/CleanIt/projects)
 
 ## Structure
  
