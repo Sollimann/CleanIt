@@ -2,10 +2,11 @@ extern crate nalgebra as na;
 use crate::slam::model::Roomba;
 use crate::utils::constants::Constants;
 use crate::utils::timer::Timer;
+use crate::utils::wrapping::wrap_heading;
 use na::{Matrix, Vector3};
 use std::f64::consts::PI;
 
-#[derive(Debug)] // needed for printing the object
+#[derive(Debug, Clone)] // needed for printing the object
 pub struct PoseWithCovariance {
     pub x: f64,
     pub y: f64,
@@ -13,7 +14,7 @@ pub struct PoseWithCovariance {
     pub covariance: [f64; 9], // 3x3 matrix represented as an array
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TwistWithCovariance {
     pub x: f64,
     pub y: f64,
@@ -21,7 +22,7 @@ pub struct TwistWithCovariance {
     pub covariance: [f64; 9], // 3x3 matrix represented as an array
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Odometry {
     // timer
     timer: Timer,
@@ -131,7 +132,7 @@ impl Odometry {
 
         self.pose.x = p_new[0];
         self.pose.y = p_new[1];
-        self.pose.yaw = p_new[2];
+        self.pose.yaw = wrap_heading(p_new[2]);
         self.vel.x = v_new[0];
         self.vel.y = v_new[1];
         self.vel.yaw = v_new[2];

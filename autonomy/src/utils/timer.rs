@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Timer {
     start: Instant,
     now: Instant,
@@ -21,9 +21,10 @@ impl Timer {
         duration.as_secs_f64()
     }
 
-    pub fn get_dt(&self) -> f64 {
+    pub fn get_dt(&mut self) -> f64 {
         let new_now: Instant = Instant::now();
         let duration = new_now.duration_since(self.now);
+        self.now = new_now;
         duration.as_secs_f64()
     }
 }
