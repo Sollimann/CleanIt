@@ -1,4 +1,5 @@
-use std::time::{Duration, Instant};
+#![allow(dead_code)]
+use std::time::Instant;
 
 #[derive(Debug, Clone)]
 pub struct Timer {
