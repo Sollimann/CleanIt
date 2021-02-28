@@ -1,5 +1,5 @@
 [package]
-name = "core"
+name = "autonomy"
 version = "0.1.0"
 authors = ["sollimann <kristoffer.solberg@cognite.com>"]
 edition = "2018"
