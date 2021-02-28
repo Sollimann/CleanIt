@@ -2,7 +2,7 @@
 
 members = [
     "drivers",
-    "core",
+    "autonomy",
     "api",
     "visualization"
 ]

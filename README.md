@@ -34,7 +34,7 @@ Would you like to contribute with work and/or ideas, feel free to check out the 
  ├── Cargo.lock
  ├── api (bin)
  |   └── server
- ├── core (bin)
+ ├── autonomy (bin)
  |   └── mission
  |   └── motion
  |   └── slam
@@ -45,7 +45,7 @@ Would you like to contribute with work and/or ideas, feel free to check out the 
  |   └── realsense
  |   └── rplidar
  |   └── raspberryPi
- └── proto
+ └── protos
  |   └── sensors.proto
  |   └── state.proto
  |   └── map2D.proto
