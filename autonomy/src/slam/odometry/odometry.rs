@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 extern crate nalgebra as na;
-use crate::slam::model::Roomba;
+use crate::slam::odometry::model::Roomba;
 use crate::utils::constants::Constants;
 use crate::utils::matrix::{
     covar_to_matrix3, mat_multiply_3x2_2x2_2x3, mat_multiply_3x3_3x3_3x3, matrix3_to_covar,
