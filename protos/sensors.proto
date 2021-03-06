@@ -8,10 +8,20 @@ package roombasensors;
 
 // interface exported by the server
 service RoombaSensors {
-  // A client-side streaming RPC where the client writes a sequence of sensors
-  // and sends them to the server. Once the client has finished writing the messages,
+  // A client-side streaming RPC
+  //
+  // where the client writes a sequence of sensors and sends them to the server.
+  // Once the client has finished writing the messages,
   // it waits for the server to read them all and return its response.
   rpc SendSensorStream(stream Sensors) returns (SensorsReceived);
+
+  // A server-to-client streaming RPC.
+  //
+  // Obtains the Features available within the given Rectangle.  Results are
+  // streamed rather than returned at once (e.g. in a response message with a
+  // repeated field), as the rectangle may cover a large area and contain a
+  // huge number of features.
+  rpc GetSensorData(SensorRequest) returns (stream Sensors);
 }
 
 
@@ -53,5 +63,5 @@ message SensorsReceived {
 }
 
 message SensorRequest {
-  uint64 timestamp= 1;
+  uint32 stream_frequency= 1;
 }

@@ -45,6 +45,21 @@ impl RoombaSensors for RoombaSensorsService {
 
         Ok(Response::new(received))
     }
+
+    // define type alias
+    #[rustfmt::skip]
+    type GetSensorDataStream = Pin<Box<dyn Stream<Item = Result<Sensors, Status>>
+        + Send
+        + Sync
+        +'static
+    >>;
+
+    async fn get_sensor_data(
+        &self,
+        request: Request<SensorRequest>,
+    ) -> Result<Response<Self::GetSensorDataStream>, Status> {
+        unimplemented!("todo!")
+    }
 }
 
 #[tokio::main]
