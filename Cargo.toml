@@ -4,5 +4,6 @@ members = [
     "drivers",
     "autonomy",
     "api",
+    "setup",
     "visualization"
 ]
