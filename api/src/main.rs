@@ -5,8 +5,10 @@ use drivers::roomba::serial_stream::yield_sensor_stream;
 use drivers::roomba::startup::{shutdown, startup};
 use futures_util::pin_mut;
 use futures_util::stream::StreamExt;
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
+use tokio::time;
 
 // our messages and services
 pub mod roombasensors {
@@ -18,19 +20,33 @@ use roombasensors::{LightBumper, SensorRequest, Sensors, SensorsReceived, Stasis
 use std::collections::HashMap;
 
 #[tokio::main]
-pub async fn drive_and_sense() {
+async fn drive_and_sense() {
     let mut port = startup();
+    let port_clone = port.try_clone().expect("Failed to clone");
 
-    let clone = port.try_clone().expect("Failed to clone");
+    // write sensor data to a shared buffer
+    let sensor_buffer: Arc<Mutex<Vec<Sensors>>> = Arc::new(Mutex::new(vec![]));
+    let buffer_clone = sensor_buffer.clone();
 
     // read sensor values in one thread
-    task::spawn(async {
+    task::spawn(async move {
         //read_serial_stream(clone, decode_sensor_packets); // 50hz
-        let sensor_reading = yield_sensor_stream(clone, decode_sensor_packets);
-        pin_mut!(sensor_reading); // needed for iteration
+        let sensor_stream = yield_sensor_stream(port_clone, decode_sensor_packets);
+        pin_mut!(sensor_stream); // needed for iteration
 
-        while let Some(value) = sensor_reading.next().await {
-            println!("got {:?}", value);
+        while let Some(value) = sensor_stream.next().await {
+            //println!("got {:?}", value);
+            let sensor_data = hashmap_to_sensor_data(value);
+            buffer_clone.lock().unwrap().push(sensor_data);
+        }
+    });
+
+    thread::spawn(move || loop {
+        thread::sleep(Duration::from_millis(20));
+        let mut data = sensor_buffer.lock().unwrap();
+        if data.len() > 0 {
+            println!("data size: {}", data.len());
+            data.pop();
         }
     });
 
