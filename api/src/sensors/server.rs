@@ -9,15 +9,8 @@ use tokio::sync::mpsc;
 
 // gRPC tools
 use futures::{Stream, StreamExt};
-use futures_util::pin_mut;
 use tonic::transport::Server;
 use tonic::{Request, Response, Status};
-
-// roomba driver
-use async_std::task;
-use drivers::roomba::packets::sensor_packets::decode_sensor_packets;
-use drivers::roomba::serial_stream::yield_sensor_stream;
-use serialport::SerialPort;
 
 // our messages and services
 pub mod roombasensors {
@@ -27,6 +20,7 @@ use drivers::roomba::startup::startup;
 use drivers::utils::enums::Value;
 use roombasensors::roomba_sensors_server::{RoombaSensors, RoombaSensorsServer};
 use roombasensors::{LightBumper, SensorRequest, Sensors, SensorsReceived, Stasis};
+use serialport::SerialPort;
 
 // defining a struct for our service
 struct ConfigurePort {
@@ -94,59 +88,26 @@ impl RoombaSensors for RoombaSensorsService {
         &self,
         request: Request<SensorRequest>,
     ) -> Result<Response<Self::GetSensorDataStream>, Status> {
-        // output stream
-        let output = async_stream::try_stream! {};
-
-        // read sensor values in one thread
-        // task::spawn(async {
-        //     //read_serial_stream(clone, decode_sensor_packets); // 50hz
         //     let sensor_reading = yield_sensor_stream(
         //         self.roomba_port.get_configured_clone(),
         //         decode_sensor_packets,
         //     );
         //     pin_mut!(sensor_reading); // needed for iteration
+        //                               // output stream
+        //     let output = async_stream::try_stream! {
+        //         //read_serial_stream(clone, decode_sensor_packets); // 50hz
+        //         //let mut data_buffer: Vec<Sensors> = Vec::new();
         //
-        //     while let Some(value) = sensor_reading.next().await {
-        //         //println!("got {:?}", value);
-        //     }
-        // });
-        //Ok(Response::new(Box::pin(output) as Self::GetSensorDataStream));
-
-        unimplemented!("")
-    }
-}
-
-fn hashmap_to_sensor_data(hashmap: HashMap<&str, Value>) -> Sensors {
-    let light_bumper_ex = LightBumper {
-        bumper_left: false,
-        bumper_front_left: true,
-        bumper_center_left: true,
-        bumper_center_right: false,
-        bumper_front_right: false,
-        bumper_right: false,
-    };
-
-    let stasis_ex = Stasis {
-        toggling: 0,
-        disabled: 1,
-    };
-
-    Sensors {
-        virtual_wall: false,
-        charging_state: 1,
-        voltage: 12345,
-        temperature: 18,
-        battery_charge: 1000,
-        battery_capacity: 2000,
-        oi_mode: 3,
-        requested_velocity: 50,
-        requested_radius: 200,
-        requested_right_velocity: 100,
-        requested_left_velocity: 100,
-        left_encoder_counts: 1111,
-        right_encoder_counts: 1245,
-        light_bumper: Some(light_bumper_ex),
-        stasis: Some(stasis_ex),
+        //         while let Some(value) = sensor_reading.next().await {
+        //             //println!("got {:?}", value);
+        //             let sensor_data = hashmap_to_sensor_data(value);
+        //             yield sensor_data.clone();
+        //             //data_buffer.push(sensor_data);
+        //         }
+        //     };
+        //
+        //     Ok(Response::new(Box::pin(output) as Self::GetSensorDataStream))
+        unimplemented!("todo")
     }
 }
 

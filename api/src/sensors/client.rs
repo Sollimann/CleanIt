@@ -1,13 +1,12 @@
-use std::error::Error;
-
-//
 use futures::stream;
+use std::error::Error;
 use tonic::transport::Channel;
 
 // our messages and services
 pub mod roombasensors {
     tonic::include_proto!("roombasensors");
 }
+
 use roombasensors::roomba_sensors_client::RoombaSensorsClient;
 use roombasensors::{LightBumper, SensorRequest, Sensors, SensorsReceived, Stasis};
 use tonic::Request;
@@ -21,7 +20,8 @@ async fn run_sensor_stream(
     }
 
     // create the request
-    let request = Request::new(stream::iter(sensor_readings));
+    let input_stream = stream::iter(sensor_readings);
+    let request = Request::new(input_stream);
 
     match client.send_sensor_stream(request).await {
         Ok(response) => println!("RESPONSE: {:?}", response.into_inner()),
