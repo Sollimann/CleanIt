@@ -15,8 +15,8 @@ use tonic::{Request, Response, Status};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // defining address for our service
-    let addr = "[::1]:10000".parse().unwrap();
-
+    let addr: String = "[::1]:10000".parse().unwrap();
+    println!("{:?}", addr);
     // // creating a service
     // let sensors_service = RoombaSensorsService {};
     //
@@ -27,5 +27,5 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // // adding our service to our server.
     // Server::builder().add_service(svc).serve(addr).await?;
     //
-    // Ok(())
+    Ok(())
 }

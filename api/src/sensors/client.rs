@@ -10,7 +10,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n*** CLIENT STREAMING ***");
     // run_sensor_stream(&mut client).await?;
     //
-    // Ok(())
+    Ok(())
 }
 
 // fn random_sensors_values() -> Sensors {

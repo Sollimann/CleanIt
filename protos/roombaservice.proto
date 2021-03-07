@@ -19,5 +19,5 @@ service Roomba {
   // streamed rather than returned at once (e.g. in a response message with a
   // repeated field), as the rectangle may cover a large area and contain a
   // huge number of features.
-  rpc GetSensorData(SensorRequest) returns (stream SensorData);
+  rpc GetSensorData(SensorsRequest) returns (stream SensorData);
 }
