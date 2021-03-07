@@ -1,14 +1,18 @@
+// get custom protos
+use proto::roomba_service_protos as protos;
+use protos::roomba_server::{Roomba, RoombaServer};
+use protos::{LightBumper, SensorData, SensorsReceived, SensorsRequest, Stasis};
+
+// get standard library utils
 use std::collections::HashMap;
 use std::marker::Sync;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::time::Instant;
 
-//We would use tokio::sync::mpsc for communicating between futures
-use tokio::sync::mpsc;
-
 // gRPC tools
 use futures::{Stream, StreamExt};
+use tokio::sync::mpsc;
 use tonic::transport::Server;
 use tonic::{Request, Response, Status};
 

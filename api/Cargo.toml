@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 drivers = { path = "../drivers"}
+proto = { path = "../proto"}
 serialport = "4.0.0"
 tonic = "0.4"
 prost = "0.7"
@@ -35,8 +36,8 @@ path = "src/lib.rs"
 # The default binary filename is src/main.rs
 [[bin]]
 name = "server"
-path = "src/sensors/server.rs"
+path = "src/facade.rs"
 
 [[bin]]
 name = "client"
-path = "src/sensors/client.rs"
+path = "src/clients/client.rs"
