@@ -11,52 +11,53 @@ use std::time::Duration;
 use tokio::time;
 
 // our messages and services
-pub mod roombasensors {
-    use tonic::include_proto;
-    include_proto!("roombasensors");
-}
+// pub mod roombasensors {
+//     use tonic::include_proto;
+//     include_proto!("roombasensors");
+// }
 use drivers::utils::enums::Value;
-use roombasensors::{LightBumper, SensorRequest, Sensors, SensorsReceived, Stasis};
+//use roombasensors::{LightBumper, SensorRequest, Sensors, SensorsReceived, Stasis};
 use std::collections::HashMap;
 
 #[tokio::main]
 async fn drive_and_sense() {
     let mut port = startup();
-    let port_clone = port.try_clone().expect("Failed to clone");
-
-    // write sensor data to a shared buffer
-    let sensor_buffer: Arc<Mutex<Vec<Sensors>>> = Arc::new(Mutex::new(vec![]));
-    let buffer_clone = sensor_buffer.clone();
-
-    // read sensor values in one thread
-    task::spawn(async move {
-        //read_serial_stream(clone, decode_sensor_packets); // 50hz
-        let sensor_stream = yield_sensor_stream(port_clone, decode_sensor_packets);
-        pin_mut!(sensor_stream); // needed for iteration
-
-        while let Some(value) = sensor_stream.next().await {
-            //println!("got {:?}", value);
-            let sensor_data = hashmap_to_sensor_data(value);
-            buffer_clone.lock().unwrap().push(sensor_data);
-        }
-    });
-
-    thread::spawn(move || loop {
-        thread::sleep(Duration::from_millis(20));
-        let mut data = sensor_buffer.lock().unwrap();
-        if data.len() > 0 {
-            println!("data size: {}", data.len());
-            data.pop();
-        }
-    });
-
-    // drive the roomba in main thread
-    //port = drive(100, 200, port);
-    port = drive_direct(55, 55, port);
-    thread::sleep(Duration::from_millis(5000));
-    port = drive_direct(0, 0, port);
-    thread::sleep(Duration::from_millis(1000));
-    shutdown(port);
+    // let port_clone = port.try_clone().expect("Failed to clone");
+    //
+    // // write sensor data to a shared buffer
+    // // https://squidarth.com/rc/rust/2018/06/04/rust-concurrency.html
+    // let sensor_buffer: Arc<Mutex<Vec<Sensors>>> = Arc::new(Mutex::new(vec![]));
+    // let buffer_clone = sensor_buffer.clone();
+    //
+    // // read sensor values in one thread
+    // task::spawn(async move {
+    //     //read_serial_stream(clone, decode_sensor_packets); // 50hz
+    //     let sensor_stream = yield_sensor_stream(port_clone, decode_sensor_packets);
+    //     pin_mut!(sensor_stream); // needed for iteration
+    //
+    //     while let Some(value) = sensor_stream.next().await {
+    //         //println!("got {:?}", value);
+    //         let sensor_data = hashmap_to_sensor_data(value);
+    //         buffer_clone.lock().unwrap().push(sensor_data);
+    //     }
+    // });
+    //
+    // thread::spawn(move || loop {
+    //     thread::sleep(Duration::from_millis(20));
+    //     let mut data = sensor_buffer.lock().unwrap();
+    //     if data.len() > 0 {
+    //         println!("data size: {}", data.len());
+    //         data.pop();
+    //     }
+    // });
+    //
+    // // drive the roomba_service in main thread
+    // //port = drive(100, 200, port);
+    // port = drive_direct(55, 55, port);
+    // thread::sleep(Duration::from_millis(5000));
+    // port = drive_direct(0, 0, port);
+    // thread::sleep(Duration::from_millis(1000));
+    // shutdown(port);
 }
 
 fn main() {

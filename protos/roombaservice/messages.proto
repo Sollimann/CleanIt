@@ -1,0 +1,34 @@
+// Version of protocol buffer used
+syntax = "proto3";
+package roombaservice;
+
+import "google/protobuf/timestamp.proto";
+// Package name for the buffer will be used later
+import "types.proto";
+
+message SensorData {
+  bool virtual_wall = 1;
+  uint32 charging_state = 2;
+  uint32 voltage = 3;
+  int32 temperature = 4;
+  uint32 battery_charge = 5;
+  uint32 battery_capacity = 6;
+  uint32 oi_mode = 7;
+  int32 requested_velocity = 8;
+  int32 requested_radius = 9;
+  int32 requested_right_velocity = 10;
+  int32 requested_left_velocity = 11;
+  uint32 left_encoder_counts = 12;
+  uint32 right_encoder_counts = 13;
+  LightBumper light_bumper = 14;
+  Stasis stasis = 15;
+}
+
+message SensorsReceived {
+  bool status = 1;
+  uint64 packet_count = 2;
+}
+
+message SensorsRequest {
+  uint32 stream_frequency= 1;
+}

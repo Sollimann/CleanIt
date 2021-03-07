@@ -1,0 +1,20 @@
+// Version of protocol buffer used
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+package roombaservice;
+// Package name for the buffer will be used later
+
+message Stasis {
+  uint32 toggling = 1;
+  uint32 disabled = 2;
+}
+
+message LightBumper {
+  bool bumper_left = 1;
+  bool bumper_front_left = 2;
+  bool bumper_center_left = 3;
+  bool bumper_center_right = 4;
+  bool bumper_front_right = 5;
+  bool bumper_right = 6;
+}

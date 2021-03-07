@@ -11,6 +11,7 @@ drivers = { path = "../drivers"}
 serialport = "4.0.0"
 tonic = "0.4"
 prost = "0.7"
+prost-types = "0.7"
 futures-core = "0.3"
 futures-util = "0.3"
 futures = { version = "0.3", default-features = false, features = ["alloc"] }
@@ -24,6 +25,7 @@ rand = "0.7"
 
 [build-dependencies]
 tonic-build = "0.4"
+prost-build = "0.7"
 
 [lib]
 name = "api"

@@ -15,12 +15,12 @@ use drivers::utils::vector_manipulation::extract_sublist;
 // Integration tests
 // #[test]
 // fn list_available_ports_test() {
-//     roomba::reading::list_ports()
+//     roomba_service::reading::list_ports()
 // }
 //
 // #[test]
 // fn read_from_port() {
-//     roomba::reading::open_and_configure_port()
+//     roomba_service::reading::open_and_configure_port()
 // }
 
 // Test decode util functions

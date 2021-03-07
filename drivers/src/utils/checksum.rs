@@ -1,4 +1,4 @@
-/// checksum calculation for roomba serial stream
+/// checksum calculation for roomba_service serial stream
 pub struct Checksum {
     current: u16,
 }
