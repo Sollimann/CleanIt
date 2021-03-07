@@ -3,6 +3,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build_client(true)
         .build_server(true)
         .format(true)
-        .compile(&["../protos/roombaservice.proto"], &["../protos"])?;
+        .compile(&["protos/roomba_service.proto"], &["protos"])?;
     Ok(())
 }

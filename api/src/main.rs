@@ -3,20 +3,14 @@ use drivers::roomba::drive::drive_direct;
 use drivers::roomba::packets::sensor_packets::decode_sensor_packets;
 use drivers::roomba::serial_stream::yield_sensor_stream;
 use drivers::roomba::startup::{shutdown, startup};
+use drivers::utils::enums::Value;
 use futures_util::pin_mut;
 use futures_util::stream::StreamExt;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 use tokio::time;
-
-// our messages and services
-pub mod roombaservice {
-    use tonic::include_proto;
-    include_proto!("roombaservice");
-}
-use drivers::utils::enums::Value;
-use roombaservice::SensorData;
+//use roomba_service::SensorData;
 //use roombasensors::{LightBumper, SensorRequest, Sensors, SensorsReceived, Stasis};
 use std::collections::HashMap;
 

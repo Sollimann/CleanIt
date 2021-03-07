@@ -2,7 +2,7 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
-package roombaservice;
+package roomba_service;
 // Package name for the buffer will be used later
 
 message Stasis {

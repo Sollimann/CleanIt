@@ -1,6 +1,6 @@
 // Version of protocol buffer used
 syntax = "proto3";
-package roombaservice;
+package roomba_service;
 import "messages.proto";
 import "types.proto";
 
