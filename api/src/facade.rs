@@ -24,7 +24,21 @@ impl Roomba for RoombaService {
         &self,
         request: Request<tonic::Streaming<SensorData>>,
     ) -> Result<Response<SensorsReceived>, Status> {
-        unimplemented!("todo")
+        let mut stream = request.into_inner();
+
+        let mut received = SensorsReceived::default();
+
+        while let Some(sensors) = stream.next().await {
+            let sensors = sensors?;
+
+            println!("  ==> Sensors = {:?}", sensors);
+
+            // Increment the point count
+            received.status = true;
+            received.packet_count += 1;
+        }
+
+        Ok(Response::new(received))
     }
 
     // define type alias
