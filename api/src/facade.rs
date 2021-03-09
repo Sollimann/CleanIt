@@ -16,20 +16,46 @@ use tokio::sync::mpsc;
 use tonic::transport::Server;
 use tonic::{Request, Response, Status};
 
+pub struct RoombaService {}
+
+#[tonic::async_trait]
+impl Roomba for RoombaService {
+    async fn send_sensor_stream(
+        &self,
+        request: Request<tonic::Streaming<SensorData>>,
+    ) -> Result<Response<SensorsReceived>, Status> {
+        unimplemented!("todo")
+    }
+
+    // define type alias
+    #[rustfmt::skip]
+    type GetSensorDataStream = Pin<Box<dyn Stream<Item = Result<SensorData, Status>>
+    + Send
+    + Sync
+    +'static >>;
+
+    async fn get_sensor_data(
+        &self,
+        request: Request<SensorsRequest>,
+    ) -> Result<Response<Self::GetSensorDataStream>, Status> {
+        unimplemented!("todo")
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // defining address for our service
-    let addr: String = "[::1]:10000".parse().unwrap();
+    let addr = "[::1]:10000".parse().unwrap();
     println!("{:?}", addr);
-    // // creating a service
-    // let sensors_service = RoombaSensorsService {};
-    //
-    // println!("Server listening on {}", addr);
-    //
-    // let svc = RoombaSensorsServer::new(sensors_service);
-    //
-    // // adding our service to our server.
-    // Server::builder().add_service(svc).serve(addr).await?;
-    //
+    // creating a service
+    let roomba_service = RoombaService {};
+
+    println!("Server listening on {}", addr);
+
+    let svc = RoombaServer::new(roomba_service);
+
+    // adding our service to our server.
+    Server::builder().add_service(svc).serve(addr).await?;
+
     Ok(())
 }
