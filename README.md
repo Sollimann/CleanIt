@@ -32,7 +32,8 @@ Would you like to contribute with work and/or ideas, feel free to check out the 
  ```bash
  ├── Cargo.toml (workspace)
  ├── Cargo.lock
- ├── api (bin)
+ ├── api (lib/bin)
+ |   └── client
  |   └── server
  ├── autonomy (bin)
  |   └── mission
@@ -45,10 +46,15 @@ Would you like to contribute with work and/or ideas, feel free to check out the 
  |   └── realsense
  |   └── rplidar
  |   └── raspberryPi
- └── protos
- |   └── sensors.proto
- |   └── state.proto
+ └── proto (lib)
+ |   └── roomba_service.proto
+ |   └── messages.proto
+ |   └── types.proto
+ |   └── robot_state.proto
  |   └── map2D.proto
+ ├── setup (bin)
+ |   └── config
+ |   └── main
  └── visualization (bin)
  |   └── urdf
  |   └── map

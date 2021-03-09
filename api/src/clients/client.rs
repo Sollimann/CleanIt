@@ -1,27 +1,23 @@
-use std::error::Error;
+// get custom protos
+use proto::roomba_service_protos as protos;
+use protos::roomba_client::RoombaClient;
+use protos::{LightBumper, SensorData, SensorsReceived, SensorsRequest, Stasis};
 
-//
+// grpc tools
 use futures::stream;
+use std::error::Error;
 use tonic::transport::Channel;
-
-// our messages and services
-pub mod roombasensors {
-    tonic::include_proto!("roombasensors");
-}
-use roombasensors::roomba_sensors_client::RoombaSensorsClient;
-use roombasensors::{LightBumper, SensorRequest, Sensors, SensorsReceived, Stasis};
 use tonic::Request;
 
-async fn run_sensor_stream(
-    client: &mut RoombaSensorsClient<Channel>,
-) -> Result<(), Box<dyn Error>> {
+async fn run_sensor_stream(client: &mut RoombaClient<Channel>) -> Result<(), Box<dyn Error>> {
     let mut sensor_readings = vec![];
     for _ in 0..100 {
         sensor_readings.push(random_sensors_values())
     }
 
     // create the request
-    let request = Request::new(stream::iter(sensor_readings));
+    let input_stream = stream::iter(sensor_readings);
+    let request = Request::new(input_stream);
 
     match client.send_sensor_stream(request).await {
         Ok(response) => println!("RESPONSE: {:?}", response.into_inner()),
@@ -33,15 +29,14 @@ async fn run_sensor_stream(
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = RoombaSensorsClient::connect("http://[::1]:10000").await?;
+    let mut client = RoombaClient::connect("http://[::1]:10000").await?;
 
     println!("\n*** CLIENT STREAMING ***");
     run_sensor_stream(&mut client).await?;
-
     Ok(())
 }
 
-fn random_sensors_values() -> Sensors {
+fn random_sensors_values() -> SensorData {
     let light_bumper_ex = LightBumper {
         bumper_left: false,
         bumper_front_left: true,
@@ -56,7 +51,7 @@ fn random_sensors_values() -> Sensors {
         disabled: 1,
     };
 
-    Sensors {
+    SensorData {
         virtual_wall: false,
         charging_state: 1,
         voltage: 12345,

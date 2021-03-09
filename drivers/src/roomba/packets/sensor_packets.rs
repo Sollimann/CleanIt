@@ -113,8 +113,8 @@ pub fn decode_sensor_packets(byte_data: &mut Vec<u8>) -> HashMap<&'static str, V
             Value::HashMap(decode_packet_58(byte_data.remove(0))),
         );
     }
-    for (key, value) in &sensor_data {
-        println!("{}: {:?}", key, inspect(&value));
-    }
+    // for (key, value) in &sensor_data {
+    //     println!("{}: {:?}", key, inspect(&value));
+    // }
     sensor_data
 }

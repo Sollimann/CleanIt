@@ -1,6 +1,6 @@
 extern crate autonomy;
 
-use autonomy::slam::odometry::Odometry;
+use autonomy::slam::odometry::odometry::Odometry;
 use std::intrinsics::copy;
 use std::thread::sleep;
 use std::time::Duration;
