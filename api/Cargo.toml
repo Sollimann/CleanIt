@@ -36,7 +36,7 @@ path = "src/lib.rs"
 # The default binary filename is src/main.rs
 [[bin]]
 name = "server"
-path = "src/facade.rs"
+path = "src/servers/facade.rs"
 
 [[bin]]
 name = "client"
