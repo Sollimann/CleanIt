@@ -1,3 +1,3 @@
 pub mod endpoints;
-pub mod server;
+pub mod facade;
 pub mod utils;

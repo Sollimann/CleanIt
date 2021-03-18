@@ -5,28 +5,36 @@ authors = ["sollimann <kristoffer.solberg@cognite.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 drivers = { path = "../drivers"}
 proto = { path = "../proto"}
 serialport = "4.0.0"
-tonic = "0.4"
 prost = "0.7"
-prost-types = "0.7"
-futures-core = "0.3"
-futures-util = "0.3"
-futures = { version = "0.3", default-features = false, features = ["alloc"] }
-tokio = { version = "1.0", features = ["rt-multi-thread", "macros", "sync", "time"] }
-
-async-stream = "0.2" # try bump to 0.3.0
+tonic = "0.4"
+tokio = { version = "1.0", features = ["rt-multi-thread", "time", "fs", "macros", "net"] }
+tokio-stream = { version =  "0.1", features = ["net"] }
+async-stream = "0.3"
 async-std = "1.9.0"
+futures-util = "0.3"
+futures-core = "0.3.12"
+futures = { version = "0.3", default-features = false, features = ["alloc"] }
+tower = { version = "0.4" }
+# Required for routeguide
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-rand = "0.7"
+rand = "0.8"
+# Tracing
+tracing = "0.1.16"
+tracing-subscriber = { version = "0.2", features = ["tracing-log"] }
+tracing-attributes = "0.1"
+tracing-futures = "0.2"
+# Required for wellknown types
+prost-types = "0.7"
 
 [build-dependencies]
 tonic-build = "0.4"
 prost-build = "0.7"
+
 
 [lib]
 name = "api"
@@ -36,8 +44,9 @@ path = "src/lib.rs"
 # The default binary filename is src/main.rs
 [[bin]]
 name = "server"
-path = "src/servers/facade.rs"
+path = "src/servers/server.rs"
 
 [[bin]]
 name = "client"
 path = "src/clients/client.rs"
+

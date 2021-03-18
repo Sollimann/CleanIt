@@ -1,72 +1,33 @@
 // get custom protos
 use proto::roomba_service_protos as protos;
-use protos::roomba_client::RoombaClient;
+use protos::roomba_server::{Roomba, RoombaServer};
 use protos::{LightBumper, SensorData, SensorsReceived, SensorsRequest, Stasis};
 
-// drivers
-use drivers::roomba::drive::drive_direct;
-use drivers::roomba::packets::sensor_packets::decode_sensor_packets;
-use drivers::roomba::serial_stream::yield_sensor_stream;
-use drivers::roomba::startup::{shutdown, startup};
-use drivers::utils::enums::Value;
+// standard lib (threading, time, mutex, hashing)
+use api::servers::facade::RoombaService;
 
 // grpc tools
-use async_std::task;
-use futures_util::pin_mut;
-use futures_util::stream::StreamExt;
-use tokio::time;
-
-// standard lib (threading, time, mutex, hashing)
-use crate::servers::utils::hashmap_to_sensor_data;
-use std::sync::{Arc, Mutex};
-use std::thread;
-use std::time::Duration;
+use drivers::roomba::startup::{shutdown, startup};
+use futures::{Stream, StreamExt};
+use tokio::sync::mpsc;
+use tokio::sync::mpsc::Receiver;
+use tonic::transport::Server;
+use tonic::{Request, Response, Status};
 
 #[tokio::main]
-async fn drive_and_sense() {
-    let mut port = startup();
-    let port_clone = port.try_clone().expect("Failed to clone");
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // defining address for our service
+    let addr = "[::1]:10000".parse().unwrap();
+    println!("{:?}", addr);
 
-    // write sensor data to a shared buffer
-    // https://squidarth.com/rc/rust/2018/06/04/rust-concurrency.html
-    let sensor_buffer: Arc<Mutex<Vec<SensorData>>> = Arc::new(Mutex::new(vec![]));
-    let buffer_clone = sensor_buffer.clone();
+    // creating a service
+    let roomba_service = RoombaService::init();
 
-    // read sensor values in one thread
-    task::spawn(async move {
-        //read_serial_stream(clone, decode_sensor_packets); // 50hz
-        let sensor_stream = yield_sensor_stream(port_clone, decode_sensor_packets);
-        pin_mut!(sensor_stream); // needed for iteration
+    println!("Server listening on {}", addr);
 
-        while let Some(value) = sensor_stream.next().await {
-            //println!("got {:?}", value);
-            let sensor_data = hashmap_to_sensor_data(value);
-            buffer_clone.lock().unwrap().push(sensor_data);
-        }
-    });
+    // adding our service to our server.
+    let svc = RoombaServer::new(roomba_service);
+    Server::builder().add_service(svc).serve(addr).await?;
 
-    thread::spawn(move || loop {
-        thread::sleep(Duration::from_millis(20));
-        let mut data = sensor_buffer.lock().unwrap();
-        if data.len() > 0 {
-            println!("data size: {}", data.len());
-            data.pop();
-        }
-    });
-
-    // drive the roomba_service in main thread
-    //port = drive(100, 200, port);
-    port = drive_direct(55, 55, port);
-    thread::sleep(Duration::from_millis(5000));
-    port = drive_direct(0, 0, port);
-    thread::sleep(Duration::from_millis(1000));
-    shutdown(port);
-}
-
-fn main() {
-    //reading::open_and_configure_port();
-    //reading::list_ports();
-    //duplex::duplex();
-    drive_and_sense();
-    //mode_commands();
+    Ok(())
 }

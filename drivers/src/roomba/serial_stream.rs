@@ -9,6 +9,10 @@ use crate::utils::checksum::Checksum;
 use crate::utils::enums::{inspect, Value};
 use crate::utils::vector_manipulation::extract_sublist;
 
+// get custom protos
+use proto::roomba_service_protos as protos;
+use protos::{LightBumper, SensorData, Stasis};
+
 // custom libs
 use colored::*;
 use serialport::SerialPort;
@@ -47,13 +51,14 @@ const SENSOR_PACKAGES_WANTED: [u8; 17] = [
     58,
 ];
 
-use async_stream::stream;
 use futures_core::stream::Stream;
+use futures_util::pin_mut;
+use futures_util::stream::StreamExt;
 
 pub fn yield_sensor_stream(
     mut port: Box<dyn SerialPort>,
     f: fn(&mut Vec<u8>) -> HashMap<&'static str, Value>,
-) -> impl Stream<Item = HashMap<&'static str, Value>> {
+) -> impl Stream<Item = SensorData> {
     let write_buffer = SENSOR_PACKAGES_WANTED;
 
     // let the buffer size be twice the expected size
@@ -70,7 +75,7 @@ pub fn yield_sensor_stream(
         .expect("Failed to write to serial port");
 
     // macro
-    stream! {
+    async_stream::stream! {
         loop {
             match port.read(&mut read_buffer) {
                 Ok(_) => {
@@ -78,7 +83,7 @@ pub fn yield_sensor_stream(
 
                     if extract_sublist(&mut byte_data, [19, nbytes], slice_size, &mut checksum) {
                         match sanitize_and_read(&mut byte_data, nbytes, f) {
-                            Some(sensor_readings) => yield sensor_readings,
+                            Some(sensor_readings) => yield hashmap_to_sensor_data(sensor_readings),
                             None => println!("sanitizing failed")
                         }
                         port.flush().unwrap();
@@ -175,4 +180,38 @@ fn sanitize(byte_data: &mut Vec<u8>, nbytes: u8) -> bool {
     byte_data.pop();
 
     true
+}
+
+fn hashmap_to_sensor_data(hashmap: HashMap<&str, Value>) -> SensorData {
+    let light_bumper_ex = LightBumper {
+        bumper_left: false,
+        bumper_front_left: true,
+        bumper_center_left: true,
+        bumper_center_right: false,
+        bumper_front_right: false,
+        bumper_right: false,
+    };
+
+    let stasis_ex = Stasis {
+        toggling: 0,
+        disabled: 1,
+    };
+
+    SensorData {
+        virtual_wall: false,
+        charging_state: 1,
+        voltage: 12345,
+        temperature: 18,
+        battery_charge: 1000,
+        battery_capacity: 2000,
+        oi_mode: 3,
+        requested_velocity: 50,
+        requested_radius: 200,
+        requested_right_velocity: 100,
+        requested_left_velocity: 100,
+        left_encoder_counts: 1111,
+        right_encoder_counts: 1245,
+        light_bumper: Some(light_bumper_ex),
+        stasis: Some(stasis_ex),
+    }
 }
