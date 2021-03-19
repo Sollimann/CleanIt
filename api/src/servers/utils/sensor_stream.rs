@@ -4,7 +4,7 @@ use protos::{LightBumper, SensorData, Stasis};
 
 // drivers
 use drivers::roomba::drive::drive_direct;
-use drivers::roomba::packets::sensor_packets::decode_sensor_packets;
+use drivers::roomba::packets::sensor_packets::decode_sensor_packets_as_proto;
 use drivers::roomba::serial_stream::yield_sensor_stream;
 use drivers::roomba::startup::{shutdown, startup};
 
@@ -30,7 +30,7 @@ async fn drive_and_sense() {
     // read sensor values in one thread
     task::spawn(async move {
         //read_serial_stream(clone, decode_sensor_packets); // 50hz
-        let sensor_stream = yield_sensor_stream(port_clone, decode_sensor_packets);
+        let sensor_stream = yield_sensor_stream(port_clone, decode_sensor_packets_as_proto);
         pin_mut!(sensor_stream); // needed for iteration
 
         while let Some(sensor_data) = sensor_stream.next().await {

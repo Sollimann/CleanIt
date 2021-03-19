@@ -57,7 +57,7 @@ use futures_util::stream::StreamExt;
 
 pub fn yield_sensor_stream(
     mut port: Box<dyn SerialPort>,
-    f: fn(&mut Vec<u8>) -> HashMap<&'static str, Value>,
+    f: fn(&mut Vec<u8>) -> SensorData,
 ) -> impl Stream<Item = SensorData> {
     let write_buffer = SENSOR_PACKAGES_WANTED;
 
@@ -83,7 +83,7 @@ pub fn yield_sensor_stream(
 
                     if extract_sublist(&mut byte_data, [19, nbytes], slice_size, &mut checksum) {
                         match sanitize_and_read(&mut byte_data, nbytes, f) {
-                            Some(sensor_readings) => yield hashmap_to_sensor_data(sensor_readings),
+                            Some(sensor_readings) => yield sensor_readings,
                             None => println!("sanitizing failed")
                         }
                         port.flush().unwrap();
@@ -104,10 +104,7 @@ pub fn yield_sensor_stream(
     }
 }
 
-pub fn read_serial_stream(
-    mut port: Box<dyn SerialPort>,
-    f: fn(&mut Vec<u8>) -> HashMap<&'static str, Value>,
-) {
+pub fn read_serial_stream(mut port: Box<dyn SerialPort>, f: fn(&mut Vec<u8>) -> SensorData) {
     let write_buffer = SENSOR_PACKAGES_WANTED;
 
     // let the buffer size be twice the expected size
@@ -152,8 +149,8 @@ pub fn read_serial_stream(
 pub fn sanitize_and_read(
     byte_data: &mut Vec<u8>,
     nbytes: u8,
-    f: fn(&mut Vec<u8>) -> HashMap<&'static str, Value>,
-) -> Option<HashMap<&'static str, Value>> {
+    f: fn(&mut Vec<u8>) -> SensorData,
+) -> Option<SensorData> {
     let sanitize_ok = sanitize(byte_data, nbytes);
 
     match sanitize_ok {

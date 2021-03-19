@@ -6,7 +6,9 @@ use drivers::roomba::decode::{
 };
 
 use drivers::roomba::packets::example_packets::decode_example_packets;
-use drivers::roomba::packets::sensor_packets::decode_sensor_packets;
+use drivers::roomba::packets::sensor_packets::{
+    decode_sensor_packets, decode_sensor_packets_as_proto,
+};
 use drivers::roomba::packets::sensor_packets_all::decode_all_sensor_packets;
 use drivers::roomba::serial_stream::sanitize_and_read;
 use drivers::utils::checksum::Checksum;
@@ -121,7 +123,7 @@ fn test_decode_serial_stream() {
     assert_eq!(true, succeeded);
 
     checksum.push_slice(&buffer_output);
-    sanitize_and_read(&mut byte_data, nbytes, decode_example_packets);
+    //sanitize_and_read(&mut byte_data, nbytes, decode_sensor_packets_as_proto);
 }
 
 #[test]
@@ -152,7 +154,7 @@ fn test_decode_sensor_serial_stream_succeed() {
 
     // let checksum_low_byte = checksum.calculate_low_byte_sum();
     // assert_eq!(checksum_low_byte, 0);
-    sanitize_and_read(&mut byte_data, nbytes, decode_sensor_packets);
+    //sanitize_and_read(&mut byte_data, nbytes, decode_sensor_packets);
 }
 
 #[test]

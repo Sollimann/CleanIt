@@ -796,7 +796,7 @@ pub fn decode_packet_45(byte: u8) -> HashMap<String, u8> {
     light_bumper.insert("bumper_front_left".to_string(), *bumper_front_left);
     light_bumper.insert("bumper_center_left".to_string(), *bumper_center_left);
     light_bumper.insert("bumper_center_right".to_string(), *bumper_center_right);
-    light_bumper.insert(" bumper_front_right".to_string(), *bumper_front_right);
+    light_bumper.insert("bumper_front_right".to_string(), *bumper_front_right);
     light_bumper.insert("bumper_right".to_string(), *bumper_right);
     light_bumper
 }
