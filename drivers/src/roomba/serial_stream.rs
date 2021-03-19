@@ -99,50 +99,8 @@ pub fn yield_sensor_stream(
                 Err(e) => eprintln!("This is an error: {:?}", e),
             };
             port.flush().unwrap();
-            thread::sleep(Duration::from_millis(20));
+            thread::sleep(Duration::from_millis(10));
         }
-    }
-}
-
-pub fn read_serial_stream(mut port: Box<dyn SerialPort>, f: fn(&mut Vec<u8>) -> SensorData) {
-    let write_buffer = SENSOR_PACKAGES_WANTED;
-
-    // let the buffer size be twice the expected size
-    let mut read_buffer = SENSOR_BUFFER;
-    let nbytes = NR_OF_SENSOR_BYTES_RECIEVED;
-
-    // init checksum
-    let mut checksum = Checksum::new();
-
-    // Read the response from the cloned port
-    port.flush().unwrap();
-    port.write_all(&write_buffer)
-        .expect("Failed to write to serial port");
-
-    loop {
-        match port.read(&mut read_buffer) {
-            Ok(bytes_recvd) => {
-                println!("buffer size: {} bytes", bytes_recvd);
-                println!("buffer content: {:?}", &read_buffer);
-                let mut byte_data = read_buffer.to_vec();
-
-                if extract_sublist(&mut byte_data, [19, 39], 42, &mut checksum) {
-                    println!("{} {:?}", "Before sanitize and read:".green(), byte_data);
-                    match sanitize_and_read(&mut byte_data, nbytes, f) {
-                        Some(val) => println!("sanitized ok"),
-                        None => println!("sanitized failed"),
-                    }
-                } else {
-                    port.flush().unwrap();
-                    let msg = "corrupted buffer".red();
-                    println!("{}", msg);
-                }
-            }
-            Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
-            Err(e) => eprintln!("This is an error: {:?}", e),
-        };
-        port.flush().unwrap();
-        thread::sleep(Duration::from_millis(20));
     }
 }
 

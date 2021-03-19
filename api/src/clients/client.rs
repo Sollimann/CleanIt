@@ -114,7 +114,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    port = drive_direct(-55, -55, port);
+    port = drive_direct(155, 155, port);
     thread::sleep(Duration::from_millis(5000));
     port = drive_direct(0, 0, port);
     thread::sleep(Duration::from_millis(1000));

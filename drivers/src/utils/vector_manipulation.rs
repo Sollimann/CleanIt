@@ -6,7 +6,6 @@ pub fn extract_sublist(
     slice_size: usize,
     checksum: &mut Checksum,
 ) -> bool {
-    println!("slice size: {}", slice_size);
     let first_index = byte_data.iter().position(|&r| r == seq[0]);
     match first_index {
         None => return false,
