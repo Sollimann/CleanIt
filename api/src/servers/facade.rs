@@ -10,7 +10,6 @@ use std::sync::{Arc, Mutex};
 
 // gRPC tools
 use futures::{Stream, StreamExt};
-use tokio::sync::mpsc::Receiver;
 use tonic::{Request, Response, Status};
 
 #[derive(Debug)]

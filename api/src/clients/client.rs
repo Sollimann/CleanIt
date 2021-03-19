@@ -4,9 +4,7 @@ use protos::roomba_client::RoombaClient;
 use protos::{LightBumper, SensorData, SensorsReceived, SensorsRequest, Stasis};
 
 // grpc tools
-use drivers::roomba::packets::sensor_packets::{
-    decode_sensor_packets, decode_sensor_packets_as_proto,
-};
+use drivers::roomba::packets::sensor_packets::decode_sensor_packets_as_proto;
 use drivers::roomba::serial_stream::yield_sensor_stream;
 
 use async_std::task;
@@ -20,41 +18,6 @@ use tonic::Request;
 use futures::stream;
 use futures_util::pin_mut;
 use futures_util::stream::StreamExt;
-
-async fn run_sensor_stream(client: &mut RoombaClient<Channel>) -> Result<(), Box<dyn Error>> {
-    let mut sensor_readings = vec![];
-    for _ in 0..100 {
-        sensor_readings.push(random_sensors_values())
-    }
-
-    // create the request
-    let input_stream = stream::iter(sensor_readings);
-    let request = Request::new(input_stream);
-
-    match client.send_sensor_stream(request).await {
-        Ok(response) => println!("RESPONSE: {:?}", response.into_inner()),
-        Err(e) => println!("Something went wrong: {:?}", e),
-    }
-
-    Ok(())
-}
-
-// async fn run_stream(
-//     port_clone: Box<dyn SerialPort>,
-//     client: &mut RoombaClient<Channel>,
-// ) -> Result<(), Box<dyn Error>> {
-//     let sensor_stream = yield_sensor_stream(port_clone, decode_sensor_packets);
-//     pin_mut!(sensor_stream);
-//     //pin_mut!(sensor_stream);
-//     let outbound = async_stream::stream! {
-//         while let Some(value) = sensor_stream.next().await {
-//             yield value
-//         }
-//     };
-//
-//     let response = client.send_sensor_stream(Request::new(outbound)).await?;
-//     Ok(())
-// }
 
 // get standard library utils
 use drivers::roomba::drive::drive_direct;
@@ -97,10 +60,7 @@ impl RoombaClientStream {
             }
         };
         let response = client.send_sensor_stream(Request::new(outbound)).await?;
-        let mut inbound = response.into_inner();
-        loop {
-            println!("go")
-        }
+        let _inbound = response.into_inner();
         Ok(())
     }
 }
@@ -154,45 +114,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    port = drive_direct(55, 55, port);
+    port = drive_direct(-55, -55, port);
     thread::sleep(Duration::from_millis(5000));
     port = drive_direct(0, 0, port);
     thread::sleep(Duration::from_millis(1000));
     shutdown(port);
 
     Ok(())
-}
-
-fn random_sensors_values() -> SensorData {
-    let light_bumper_ex = LightBumper {
-        bumper_left: false,
-        bumper_front_left: true,
-        bumper_center_left: true,
-        bumper_center_right: false,
-        bumper_front_right: false,
-        bumper_right: false,
-    };
-
-    let stasis_ex = Stasis {
-        toggling: 0,
-        disabled: 1,
-    };
-
-    SensorData {
-        virtual_wall: false,
-        charging_state: 1,
-        voltage: 12345,
-        temperature: 18,
-        battery_charge: 1000,
-        battery_capacity: 2000,
-        oi_mode: 3,
-        requested_velocity: 50,
-        requested_radius: 200,
-        requested_right_velocity: 100,
-        requested_left_velocity: 100,
-        left_encoder_counts: 1111,
-        right_encoder_counts: 1245,
-        light_bumper: Some(light_bumper_ex),
-        stasis: Some(stasis_ex),
-    }
 }
