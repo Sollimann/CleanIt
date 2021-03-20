@@ -28,43 +28,6 @@ use tokio::sync::mpsc;
 use tokio::sync::mpsc::Receiver;
 use tokio::time;
 
-#[derive(Debug, Clone)]
-pub struct RoombaClientStream {
-    sensor_buffer: Arc<Mutex<Vec<SensorData>>>,
-}
-impl RoombaClientStream {
-    pub fn init() -> RoombaClientStream {
-        RoombaClientStream {
-            sensor_buffer: Arc::new(Mutex::new(vec![])),
-        }
-    }
-    pub fn push_sensor_data_to_buffer(&self, sensor_data: SensorData) {
-        let buffer_clone = self.sensor_buffer.clone();
-        buffer_clone.lock().unwrap().push(sensor_data);
-    }
-    fn pop_sensor_data_from_buffer(&self) -> Option<SensorData> {
-        let mut sensor_buffer = self.sensor_buffer.lock().unwrap();
-        if sensor_buffer.len() > 0 {
-            Some(sensor_buffer.remove(0))
-        } else {
-            None
-        }
-    }
-    pub async fn stream(self, client: &mut RoombaClient<Channel>) -> Result<(), Box<dyn Error>> {
-        let outbound = async_stream::stream! {
-            let mut interval = time::interval(Duration::from_millis(20));
-
-            while let time = interval.tick().await {
-                let data = self.pop_sensor_data_from_buffer().unwrap();
-                yield data;
-            }
-        };
-        let response = client.send_sensor_stream(Request::new(outbound)).await?;
-        let _inbound = response.into_inner();
-        Ok(())
-    }
-}
-
 pub async fn stream(
     client: &mut RoombaClient<Channel>,
     mut rx: Receiver<SensorData>,
@@ -114,7 +77,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    port = drive_direct(155, 155, port);
+    port = drive_direct(-55, -55, port);
     thread::sleep(Duration::from_millis(5000));
     port = drive_direct(0, 0, port);
     thread::sleep(Duration::from_millis(1000));
