@@ -4,19 +4,40 @@ use protos::roomba_server::{Roomba, RoombaServer};
 use protos::{LightBumper, SensorData, SensorsReceived, SensorsRequest, Stasis};
 
 // get standard library utils
-use std::collections::HashMap;
 use std::marker::Sync;
 use std::pin::Pin;
-use std::sync::Arc;
-use std::time::Instant;
+use std::sync::{Arc, Mutex};
 
 // gRPC tools
 use futures::{Stream, StreamExt};
-use tokio::sync::mpsc;
-use tonic::transport::Server;
 use tonic::{Request, Response, Status};
 
-pub struct RoombaService {}
+#[derive(Debug)]
+pub struct RoombaService {
+    sensor_buffer: Arc<Mutex<Vec<SensorData>>>,
+}
+
+impl RoombaService {
+    pub fn init() -> RoombaService {
+        RoombaService {
+            sensor_buffer: Arc::new(Mutex::new(vec![])),
+        }
+    }
+
+    pub fn push_sensor_data_to_buffer(&self, sensor_data: SensorData) {
+        let buffer_clone = self.sensor_buffer.clone();
+        buffer_clone.lock().unwrap().push(sensor_data);
+    }
+
+    pub fn pop_sensor_data_from_buffer(&self) -> Option<SensorData> {
+        let mut sensor_buffer = self.sensor_buffer.lock().unwrap();
+        if sensor_buffer.len() > 0 {
+            Some(sensor_buffer.remove(0))
+        } else {
+            None
+        }
+    }
+}
 
 #[tonic::async_trait]
 impl Roomba for RoombaService {
@@ -54,22 +75,4 @@ impl Roomba for RoombaService {
     ) -> Result<Response<Self::GetSensorDataStream>, Status> {
         unimplemented!("todo")
     }
-}
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // defining address for our service
-    let addr = "[::1]:10000".parse().unwrap();
-    println!("{:?}", addr);
-    // creating a service
-    let roomba_service = RoombaService {};
-
-    println!("Server listening on {}", addr);
-
-    let svc = RoombaServer::new(roomba_service);
-
-    // adding our service to our server.
-    Server::builder().add_service(svc).serve(addr).await?;
-
-    Ok(())
 }
