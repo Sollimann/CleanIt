@@ -28,7 +28,7 @@ use tokio::sync::mpsc;
 use tokio::sync::mpsc::Receiver;
 use tokio::time;
 
-pub async fn stream(
+pub async fn client_side_stream(
     client: &mut RoombaClient<Channel>,
     mut rx: Receiver<SensorData>,
 ) -> Result<(), Box<dyn Error>> {
@@ -56,7 +56,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut port = startup();
     let port_clone = port.try_clone().expect("Failed to clone");
 
-    let (mut tx, rx) = mpsc::channel(100);
+    let (tx, rx) = mpsc::channel(100);
     task::spawn(async move {
         //read_serial_stream(clone, decode_sensor_packets); // 50hz
         let sensor_stream = yield_sensor_stream(port_clone, decode_sensor_packets_as_proto);
@@ -64,16 +64,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         while let Some(sensor_data) = sensor_stream.next().await {
             if let Err(_) = tx.send(sensor_data).await {
-                println!("receiver dropped");
+                eprintln!("receiver dropped!");
                 return;
             }
         }
     });
 
     tokio::spawn(async move {
-        match stream(&mut client, rx).await {
+        match client_side_stream(&mut client, rx).await {
             Ok(_) => println!("OK!"),
-            Err(e) => println!("Something went wrong: {:?}", e),
+            Err(e) => eprintln!("Something went wrong: {:?}", e),
         }
     });
 
