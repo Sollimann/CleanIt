@@ -12,7 +12,7 @@ use protos::SensorData;
 
 #[derive(Debug)]
 pub struct RoombaService {
-    pub sensor_buffer: Arc<Mutex<Vec<SensorData>>>,
+    pub(crate) sensor_buffer: Arc<Mutex<Vec<SensorData>>>,
     rx: Receiver<SensorData>,
     tx: Sender<SensorData>,
 }

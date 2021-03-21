@@ -20,6 +20,7 @@ use futures_util::pin_mut;
 use futures_util::stream::StreamExt;
 
 // get standard library utils
+use colored::Colorize;
 use drivers::roomba::drive::drive_direct;
 use drivers::roomba::startup::{shutdown, startup};
 use std::sync::{Arc, Mutex};
@@ -63,8 +64,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         pin_mut!(sensor_stream); // needed for iteration
 
         while let Some(sensor_data) = sensor_stream.next().await {
-            if let Err(_) = tx.send(sensor_data).await {
-                eprintln!("receiver dropped!");
+            if tx.send(sensor_data).await.is_err() {
+                eprintln!("{}", "receiver dropped!".red());
                 return;
             }
         }
@@ -72,7 +73,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     tokio::spawn(async move {
         match client_side_stream(&mut client, rx).await {
-            Ok(_) => println!("OK!"),
+            Ok(_) => println!("{}", "OK!".green()),
             Err(e) => eprintln!("Something went wrong: {:?}", e),
         }
     });

@@ -8,6 +8,7 @@ use tonic::{Request, Response, Status};
 
 // get standard library utils
 use crate::servers::endpoints::RoombaService;
+use colored::Colorize;
 use std::marker::Sync;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
@@ -21,10 +22,21 @@ impl RoombaService {
 
         let mut received = SensorsReceived::default();
 
-        while let Some(sensors) = stream.next().await {
-            let sensors = sensors?;
+        while let Some(sensor_readings) = stream.next().await {
+            println!("  ==> Sensors = {:?}", sensor_readings);
+            let sensor_data: SensorData = match sensor_readings {
+                Ok(data) => data,
+                Err(error) => {
+                    panic!(
+                        "There was a problem reading sensor data stream: {:?}",
+                        error
+                    )
+                }
+            };
 
-            println!("  ==> Sensors = {:?}", sensors);
+            if self.tx.send(sensor_data).await.is_err() {
+                eprintln!("{}", "receiver dropped!".red());
+            }
 
             // Increment the point count
             received.status = true;
