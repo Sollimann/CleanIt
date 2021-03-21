@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("{:?}", addr);
 
     // creating a service
-    let roomba_service = RoombaService::default();
+    let roomba_service = RoombaService::new();
 
     println!("Server listening on {}", addr);
 

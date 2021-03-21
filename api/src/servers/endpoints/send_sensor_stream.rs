@@ -27,17 +27,16 @@ impl RoombaService {
             match sensor_readings {
                 Ok(data) => {
                     println!("  ==> Sensors = {:?}", data);
-                    if self.tx.send(data).is_err() {
-                        eprintln!("{}", "receiver dropped!".red());
-                    }
+                    // self.tx.send(data).unwrap();
+                    self.push_sensor_data_to_buffer(data);
                 }
                 Err(err) => {
                     panic!("Something went wrong unwrapping sensor readings: {:?}", err)
                 }
             };
 
-            let rc = self.rx.recv().unwrap();
-            println!("received {:?}", rc);
+            // let rc = self.rx.recv().unwrap();
+            // println!("received {:?}", rc);
 
             // Increment the point count
             received.status = true;
