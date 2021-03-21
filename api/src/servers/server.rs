@@ -4,9 +4,10 @@ use protos::roomba_server::{Roomba, RoombaServer};
 use protos::{LightBumper, SensorData, SensorsReceived, SensorsRequest, Stasis};
 
 // standard lib (threading, time, mutex, hashing)
-use api::servers::facade::RoombaService;
+// use api::servers::facade::RoombaService;
 
 // grpc tools
+use api::servers::endpoints::RoombaService;
 use drivers::roomba::startup::{shutdown, startup};
 use futures::{Stream, StreamExt};
 use tokio::sync::mpsc;
@@ -21,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("{:?}", addr);
 
     // creating a service
-    let roomba_service = RoombaService::init();
+    let roomba_service = RoombaService::default();
 
     println!("Server listening on {}", addr);
 

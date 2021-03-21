@@ -9,21 +9,11 @@ use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 
 // gRPC tools
+use crate::servers::endpoints::RoombaService;
 use futures::{Stream, StreamExt};
 use tonic::{Request, Response, Status};
 
-#[derive(Debug)]
-pub struct RoombaService {
-    sensor_buffer: Arc<Mutex<Vec<SensorData>>>,
-}
-
 impl RoombaService {
-    pub fn init() -> RoombaService {
-        RoombaService {
-            sensor_buffer: Arc::new(Mutex::new(vec![])),
-        }
-    }
-
     pub fn push_sensor_data_to_buffer(&self, sensor_data: SensorData) {
         let buffer_clone = self.sensor_buffer.clone();
         buffer_clone.lock().unwrap().push(sensor_data);
@@ -45,21 +35,7 @@ impl Roomba for RoombaService {
         &self,
         request: Request<tonic::Streaming<SensorData>>,
     ) -> Result<Response<SensorsReceived>, Status> {
-        let mut stream = request.into_inner();
-
-        let mut received = SensorsReceived::default();
-
-        while let Some(sensors) = stream.next().await {
-            let sensors = sensors?;
-
-            println!("  ==> Sensors = {:?}", sensors);
-
-            // Increment the point count
-            received.status = true;
-            received.packet_count += 1;
-        }
-
-        Ok(Response::new(received))
+        self.handle_send_sensor_stream(request).await
     }
 
     // define type alias
