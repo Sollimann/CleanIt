@@ -97,7 +97,7 @@ pub fn yield_sensor_stream(
                 Err(e) => eprintln!("This is an error: {:?}", e),
             };
             port.flush().unwrap();
-            thread::sleep(Duration::from_millis(10));
+            thread::sleep(Duration::from_millis(20));
         }
     }
 }

@@ -50,7 +50,7 @@ pub async fn client_side_stream(
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = RoombaClient::connect("http://[::1]:10000").await?;
+    let mut client = RoombaClient::connect("http://[::1]:10002").await?;
 
     println!("\n*** CLIENT STREAMING ***");
 
