@@ -49,14 +49,10 @@ path = "src/lib.rs"
 # Binary targets are executables programs that can be run after being compiled.
 # The default binary filename is src/main.rs
 [[bin]]
-name = "server"
+name = "streaming-server"
 path = "src/servers/server.rs"
 
 [[bin]]
-name = "client"
+name = "roomba-client"
 path = "src/clients/client.rs"
-
-[[bin]]
-name = "reader"
-path = "src/clients/reader.rs"
 

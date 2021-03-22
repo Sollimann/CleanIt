@@ -1,13 +1,13 @@
-# Run the API:
+## Run the Roomba client and API
 
-### Run the server
-
-```
-$ cargo run --bin server
-```
-
-### Run the client
+#### Run the server
 
 ```
-$ cargo run --bin client
+$ cargo run --bin streaming-server
+```
+
+#### Run the client
+
+```
+$ cargo run --bin roomba-client
 ```
