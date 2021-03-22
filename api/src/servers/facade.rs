@@ -4,40 +4,27 @@ use protos::roomba_server::{Roomba, RoombaServer};
 use protos::{LightBumper, SensorData, SensorsReceived, SensorsRequest, Stasis};
 
 // get standard library utils
+use async_std::task;
 use std::marker::Sync;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
+extern crate proc_macro;
+use proc_macro::TokenStream;
+
+use futures_core::stream::Stream;
+use futures_util::pin_mut;
+use futures_util::stream::StreamExt;
 
 // gRPC tools
-use futures::{Stream, StreamExt};
+use crate::servers::endpoints::RoombaService;
+// use futures::{Stream, StreamExt};
+// use proc_macro::TokenStream;
+use crate::servers::utils::SyncBoxStream;
+use colored::Colorize;
+use std::thread;
+use tokio::sync::mpsc;
+use tokio::time::Duration;
 use tonic::{Request, Response, Status};
-
-#[derive(Debug)]
-pub struct RoombaService {
-    sensor_buffer: Arc<Mutex<Vec<SensorData>>>,
-}
-
-impl RoombaService {
-    pub fn init() -> RoombaService {
-        RoombaService {
-            sensor_buffer: Arc::new(Mutex::new(vec![])),
-        }
-    }
-
-    pub fn push_sensor_data_to_buffer(&self, sensor_data: SensorData) {
-        let buffer_clone = self.sensor_buffer.clone();
-        buffer_clone.lock().unwrap().push(sensor_data);
-    }
-
-    pub fn pop_sensor_data_from_buffer(&self) -> Option<SensorData> {
-        let mut sensor_buffer = self.sensor_buffer.lock().unwrap();
-        if sensor_buffer.len() > 0 {
-            Some(sensor_buffer.remove(0))
-        } else {
-            None
-        }
-    }
-}
 
 #[tonic::async_trait]
 impl Roomba for RoombaService {
@@ -45,34 +32,34 @@ impl Roomba for RoombaService {
         &self,
         request: Request<tonic::Streaming<SensorData>>,
     ) -> Result<Response<SensorsReceived>, Status> {
-        let mut stream = request.into_inner();
-
-        let mut received = SensorsReceived::default();
-
-        while let Some(sensors) = stream.next().await {
-            let sensors = sensors?;
-
-            println!("  ==> Sensors = {:?}", sensors);
-
-            // Increment the point count
-            received.status = true;
-            received.packet_count += 1;
-        }
-
-        Ok(Response::new(received))
+        self.handle_send_sensor_stream(request).await
     }
 
-    // define type alias
-    #[rustfmt::skip]
-    type GetSensorDataStream = Pin<Box<dyn Stream<Item = Result<SensorData, Status>>
-    + Send
-    + Sync
-    +'static >>;
+    type GetSensorDataStream = SyncBoxStream<'static, Result<SensorData, Status>>;
 
     async fn get_sensor_data(
         &self,
         request: Request<SensorsRequest>,
     ) -> Result<Response<Self::GetSensorDataStream>, Status> {
-        unimplemented!("todo")
+        println!("request = {:?}", request);
+
+        let (tx, rx) = mpsc::channel(1);
+        let rx_clone = self.rx.clone();
+
+        let mut count: u32 = 0;
+        tokio::spawn(async move {
+            while let Ok(data) = rx_clone.recv() {
+                thread::sleep(Duration::from_millis(20));
+                println!("{}", "sending data from server".green());
+                tx.send(Ok(data)).await.unwrap();
+                count += 1;
+                println!("count: {}", &count);
+            }
+            println!("{}", "failed sending data from server".red());
+        });
+
+        Ok(Response::new(Box::pin(
+            tokio_stream::wrappers::ReceiverStream::new(rx),
+        )))
     }
 }

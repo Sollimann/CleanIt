@@ -26,6 +26,20 @@ Motivation is to build a complete DIY autonomy software from scratch (motion pla
 
 Would you like to contribute with work and/or ideas, feel free to check out the [Project Backlog](https://github.com/Sollimann/CleanIt/projects)
 
+## Run the Roomba client and API
+
+#### Run the server
+
+```
+$ cargo run --bin streaming-server
+```
+
+#### Run the client
+
+```
+$ cargo run --bin roomba-client
+```
+
 ## Structure
  
 #### Project Layout
