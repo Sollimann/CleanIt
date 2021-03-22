@@ -87,10 +87,10 @@ pub fn yield_sensor_stream(
                             None => println!("sanitizing failed")
                         }
                         port.flush().unwrap();
-                        println!("{}", "OK!".green());
+                        // println!("{}", "OK!".green());
                     } else {
                         port.flush().unwrap();
-                        println!("{}", "corrupted buffer".red());
+                        // println!("{}", "corrupted buffer".red());
                     }
                 }
                 Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),

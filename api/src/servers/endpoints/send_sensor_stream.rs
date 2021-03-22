@@ -27,8 +27,8 @@ impl RoombaService {
             match sensor_readings {
                 Ok(data) => {
                     println!("  ==> Sensors = {:?}", data);
-                    // self.tx.send(data).unwrap();
-                    self.push_sensor_data_to_buffer(data);
+                    self.tx.send(data).unwrap();
+                    //self.push_sensor_data_to_buffer(data);
                 }
                 Err(err) => {
                     panic!("Something went wrong unwrapping sensor readings: {:?}", err)

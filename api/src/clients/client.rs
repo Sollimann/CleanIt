@@ -24,10 +24,10 @@ use colored::Colorize;
 use drivers::roomba::drive::drive_direct;
 use drivers::roomba::startup::{shutdown, startup};
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::Receiver;
 use tokio::time;
+use tokio::time::Duration;
 
 pub async fn client_side_stream(
     client: &mut RoombaClient<Channel>,
@@ -48,16 +48,40 @@ pub async fn client_side_stream(
     Ok(())
 }
 
+pub async fn get_sensor_data(client: &mut RoombaClient<Channel>) -> Result<(), Box<dyn Error>> {
+    let request = SensorsRequest {
+        stream_frequency: 20, // Hz
+    };
+
+    let mut stream = client
+        .get_sensor_data(Request::new(request))
+        .await?
+        .into_inner();
+
+    let mut count: u32 = 0;
+    while let Some(data) = stream.message().await? {
+        thread::sleep(Duration::from_millis(20));
+        println!("some data = {:?}", data);
+        println!("{}", "receiving data from server".green());
+        count += 1;
+        println!("count: {}", &count);
+    }
+
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = RoombaClient::connect("http://[::1]:10002").await?;
+    let mut client1 = RoombaClient::connect("http://[::1]:10001").await?;
+    // let mut client2 = RoombaClient::connect("http://[::1]:10006").await?;
+    let mut client2 = client1.clone();
 
     println!("\n*** CLIENT STREAMING ***");
 
     let mut port = startup();
     let port_clone = port.try_clone().expect("Failed to clone");
 
-    let (tx, rx) = mpsc::channel(100);
+    let (tx, rx) = mpsc::channel(300);
     task::spawn(async move {
         //read_serial_stream(clone, decode_sensor_packets); // 50hz
         let sensor_stream = yield_sensor_stream(port_clone, decode_sensor_packets_as_proto);
@@ -72,13 +96,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     tokio::spawn(async move {
-        match client_side_stream(&mut client, rx).await {
-            Ok(_) => println!("{}", "OK!".green()),
+        match client_side_stream(&mut client1, rx).await {
+            Ok(_) => println!("{}", "client side stream: OK!".green()),
             Err(e) => eprintln!("Something went wrong: {:?}", e),
         }
     });
 
-    port = drive_direct(-55, -55, port);
+    // give some time for service to start
+
+    tokio::spawn(async move {
+        match get_sensor_data(&mut client2).await {
+            Ok(_) => println!("{}", "get sensor data: OK!".green()),
+            Err(e) => eprintln!("Something went wrong: {:?}", e),
+        }
+    });
+
+    // give some time for service to start
+    thread::sleep(Duration::from_millis(1500));
+
+    port = drive_direct(35, 35, port);
     thread::sleep(Duration::from_millis(5000));
     port = drive_direct(0, 0, port);
     thread::sleep(Duration::from_millis(1000));

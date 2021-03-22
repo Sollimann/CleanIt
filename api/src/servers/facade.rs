@@ -20,8 +20,10 @@ use crate::servers::endpoints::RoombaService;
 // use futures::{Stream, StreamExt};
 // use proc_macro::TokenStream;
 use crate::servers::utils::SyncBoxStream;
+use colored::Colorize;
 use std::thread;
 use tokio::sync::mpsc;
+use tokio::time::Duration;
 use tonic::{Request, Response, Status};
 
 #[tonic::async_trait]
@@ -33,13 +35,6 @@ impl Roomba for RoombaService {
         self.handle_send_sensor_stream(request).await
     }
 
-    // define type alias
-    // #[rustfmt::skip]
-    // type GetSensorDataStream = Pin<Box<dyn Stream<Item = Result<SensorData, Status>>
-    // + Send
-    // + Sync
-    // + 'static
-    // >>;
     type GetSensorDataStream = SyncBoxStream<'static, Result<SensorData, Status>>;
 
     async fn get_sensor_data(
@@ -48,18 +43,20 @@ impl Roomba for RoombaService {
     ) -> Result<Response<Self::GetSensorDataStream>, Status> {
         println!("request = {:?}", request);
 
-        let (tx, rx) = mpsc::channel(4);
+        let (tx, rx) = mpsc::channel(1);
+        let rx_clone = self.rx.clone();
 
-        // tokio::spawn(async {
-        //     loop {
-        //         if let Some(data) = self.pop_sensor_data_from_buffer() {
-        //             tx.send(Ok(data)).await.unwrap();
-        //         }
-        //     }
-        // });
-        if let Some(data) = self.pop_sensor_data_from_buffer() {
-            tx.send(Ok(data)).await.unwrap();
-        }
+        let mut count: u32 = 0;
+        tokio::spawn(async move {
+            while let Ok(data) = rx_clone.recv() {
+                thread::sleep(Duration::from_millis(20));
+                println!("{}", "sending data from server".green());
+                tx.send(Ok(data)).await.unwrap();
+                count += 1;
+                println!("count: {}", &count);
+            }
+            println!("{}", "failed sending data from server".red());
+        });
 
         Ok(Response::new(Box::pin(
             tokio_stream::wrappers::ReceiverStream::new(rx),

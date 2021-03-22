@@ -56,3 +56,7 @@ path = "src/servers/server.rs"
 name = "client"
 path = "src/clients/client.rs"
 
+[[bin]]
+name = "reader"
+path = "src/clients/reader.rs"
+
