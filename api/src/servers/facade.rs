@@ -1,7 +1,9 @@
 // get custom protos
 use proto::roomba_service_protos as protos;
 use protos::roomba_server::{Roomba, RoombaServer};
-use protos::{LightBumper, SensorData, SensorsReceived, SensorsRequest, Stasis};
+use protos::{LightBumper, SensorData, Stasis};
+use protos::{Odometry, OdometryRequest};
+use protos::{SensorsReceived, SensorsRequest};
 
 // get standard library utils
 use async_std::task;
@@ -61,5 +63,14 @@ impl Roomba for RoombaService {
         Ok(Response::new(Box::pin(
             tokio_stream::wrappers::ReceiverStream::new(rx),
         )))
+    }
+
+    type GetOdometryRawStream = SyncBoxStream<'static, Result<Odometry, Status>>;
+
+    async fn get_odometry_raw(
+        &self,
+        request: Request<OdometryRequest>,
+    ) -> Result<Response<Self::GetOdometryRawStream>, Status> {
+        unimplemented!("todo")
     }
 }

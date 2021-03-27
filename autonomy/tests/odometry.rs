@@ -1,13 +1,13 @@
 extern crate autonomy;
 
-use autonomy::slam::odometry::odometry::Odometry;
+use autonomy::slam::odometry::odometry::OdometryStamped;
 use std::intrinsics::copy;
 use std::thread::sleep;
 use std::time::Duration;
 
 #[test]
 fn test_odometry_init() {
-    let mut odom = Odometry::init(0, 0);
+    let mut odom = OdometryStamped::init(0, 0);
     let (left, right) = odom.wrap_encoders(100, 100);
 
     assert_eq!(left, 100);
@@ -16,7 +16,7 @@ fn test_odometry_init() {
 
 #[test]
 fn test_encoder_wrapping_forward() {
-    let mut odom = Odometry::init(65500, 65500);
+    let mut odom = OdometryStamped::init(65500, 65500);
     let (left, right) = odom.wrap_encoders(200, 200);
 
     assert_eq!(left, 235);
@@ -25,7 +25,7 @@ fn test_encoder_wrapping_forward() {
 
 #[test]
 fn test_encoder_wrapping_backward() {
-    let mut odom = Odometry::init(200, 200);
+    let mut odom = OdometryStamped::init(200, 200);
     let (left, right) = odom.wrap_encoders(65500, 65500);
 
     assert_eq!(left, -235);
@@ -34,7 +34,7 @@ fn test_encoder_wrapping_backward() {
 
 #[test]
 fn test_encoder_wrapping_backward_then_forward() {
-    let mut odom = Odometry::init(200, 200);
+    let mut odom = OdometryStamped::init(200, 200);
     let (left_0, right_0) = odom.wrap_encoders(65500, 65500);
 
     assert_eq!(left_0, -235);
@@ -47,7 +47,7 @@ fn test_encoder_wrapping_backward_then_forward() {
 
 #[test]
 fn test_compute_odom_driving_straight() {
-    let mut odom = Odometry::init(200, 200);
+    let mut odom = OdometryStamped::init(200, 200);
     sleep(Duration::new(0, 0.5e+9 as u32));
     odom.compute_odom(1200, 1200);
 
@@ -68,7 +68,7 @@ fn test_compute_odom_driving_straight() {
 
 #[test]
 fn test_compute_odom_driving_counter_clockwise() {
-    let mut odom = Odometry::init(200, 200);
+    let mut odom = OdometryStamped::init(200, 200);
     sleep(Duration::new(0, 0.5e+9 as u32));
     odom.compute_odom(1200, 2000);
 
@@ -80,7 +80,7 @@ fn test_compute_odom_driving_counter_clockwise() {
 
 #[test]
 fn test_compute_odom_driving_180_clockwise() {
-    let mut odom = Odometry::init(200, 200);
+    let mut odom = OdometryStamped::init(200, 200);
     sleep(Duration::new(0, 1e+9 as u32));
     odom.compute_odom(3800, 2200);
 
@@ -103,7 +103,7 @@ fn test_compute_odom_driving_180_clockwise() {
 
 #[test]
 fn test_compute_odom_driving_forward_then_backward() {
-    let mut odom = Odometry::init(200, 200);
+    let mut odom = OdometryStamped::init(200, 200);
     sleep(Duration::new(0, 1e+9 as u32));
     odom.compute_odom(1000, 1000);
 

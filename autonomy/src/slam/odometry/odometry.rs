@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 extern crate nalgebra as na;
-use crate::slam::odometry::model::Roomba;
+use crate::slam::odometry::model::{PoseWithCovariance, Roomba, TwistWithCovariance};
 use crate::utils::constants::Constants;
 use crate::utils::matrix::{
     covar_to_matrix3, mat_multiply_3x2_2x2_2x3, mat_multiply_3x3_3x3_3x3, matrix3_to_covar,
@@ -10,24 +10,13 @@ use crate::utils::wrapping::wrap_heading;
 use na::{Matrix2, Matrix3, Matrix3x2, RowVector2, RowVector3, Vector3};
 use std::f64::consts::PI;
 
-#[derive(Debug, Clone)] // needed for printing the object
-pub struct PoseWithCovariance {
-    pub x: f64,
-    pub y: f64,
-    pub yaw: f64,
-    pub covariance: [f64; 9], // 3x3 matrix represented as an array
-}
+// get custom protos
+use prost_types::Duration;
+use proto::roomba_service_protos as protos;
+use protos::{Odometry, Pose, Twist};
 
 #[derive(Debug, Clone)]
-pub struct TwistWithCovariance {
-    pub x: f64,
-    pub y: f64,
-    pub yaw: f64,
-    pub covariance: [f64; 9], // 3x3 matrix represented as an array
-}
-
-#[derive(Debug, Clone)]
-pub struct Odometry {
+pub struct OdometryStamped {
     // timer
     timer: Timer,
 
@@ -48,10 +37,10 @@ pub struct Odometry {
     prev_ticks_right: u16,
 }
 
-impl Odometry {
+impl OdometryStamped {
     // @classmethod
-    pub fn init(init_left_ticks: u16, init_right_ticks: u16) -> Odometry {
-        Odometry {
+    pub fn init(init_left_ticks: u16, init_right_ticks: u16) -> OdometryStamped {
+        OdometryStamped {
             timer: Timer::init_time(),
             pose: PoseWithCovariance {
                 x: 0.0,
@@ -97,7 +86,7 @@ impl Odometry {
         (delta_ticks_left, delta_ticks_right)
     }
 
-    pub fn compute_odom(&mut self, curr_ticks_left: u16, curr_ticks_right: u16) -> &mut Odometry {
+    pub fn compute_odom(&mut self, curr_ticks_left: u16, curr_ticks_right: u16) -> Odometry {
         // update timestamp
         let dt = self.timer.get_dt();
 
@@ -199,6 +188,33 @@ impl Odometry {
         self.vel.yaw = v_new[2];
         self.vel.covariance = matrix3_to_covar(vel_covar_matrix_est);
 
-        self
+        self.odom_stamped_to_msg()
+    }
+
+    fn odom_stamped_to_msg(&self) -> Odometry {
+        let pose: Option<Pose> = futures_util::__private::Some(Pose {
+            x: self.pose.x,
+            y: self.pose.y,
+            yaw: self.pose.yaw,
+            covariance: self.pose.covariance.to_vec(),
+        });
+
+        let vel: Option<Twist> = futures_util::__private::Some(Twist {
+            x: self.vel.x,
+            y: self.vel.y,
+            yaw: self.vel.yaw,
+            covariance: self.vel.covariance.to_vec(),
+        });
+
+        let timestamp: Option<Duration> = futures_util::__private::Some(Duration {
+            seconds: 100,
+            nanos: 100,
+        });
+
+        Odometry {
+            timestamp,
+            pose,
+            vel,
+        }
     }
 }
