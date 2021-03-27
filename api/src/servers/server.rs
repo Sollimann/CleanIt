@@ -1,7 +1,6 @@
 // get custom protos
 use proto::roomba_service_protos as protos;
-use protos::roomba_server::{Roomba, RoombaServer};
-use protos::{LightBumper, SensorData, SensorsReceived, SensorsRequest, Stasis};
+use protos::roomba_server::RoombaServer;
 
 // standard lib (threading, time, mutex, hashing)
 // use api::servers::facade::RoombaService;

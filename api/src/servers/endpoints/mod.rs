@@ -1,3 +1,5 @@
+mod get_odometry_raw;
+mod get_sensor_data;
 mod send_sensor_stream;
 
 use std::sync::{Arc, Mutex};
