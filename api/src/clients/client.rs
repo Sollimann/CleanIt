@@ -1,7 +1,9 @@
 // get custom protos
 use proto::roomba_service_protos as protos;
 use protos::roomba_client::RoombaClient;
-use protos::{LightBumper, SensorData, SensorsReceived, SensorsRequest, Stasis};
+use protos::{
+    LightBumper, Odometry, OdometryRequest, SensorData, SensorsReceived, SensorsRequest, Stasis,
+};
 
 // grpc tools
 use drivers::roomba::packets::sensor_packets::decode_sensor_packets_as_proto;
@@ -70,6 +72,28 @@ pub async fn get_sensor_data(client: &mut RoombaClient<Channel>) -> Result<(), B
     Ok(())
 }
 
+pub async fn get_odometry_raw(client: &mut RoombaClient<Channel>) -> Result<(), Box<dyn Error>> {
+    let request = OdometryRequest {
+        stream_frequency: 20, // Hz
+    };
+
+    let mut stream = client
+        .get_odometry_raw(Request::new(request))
+        .await?
+        .into_inner();
+
+    let mut count: u32 = 0;
+    while let Some(data) = stream.message().await? {
+        thread::sleep(Duration::from_millis(20));
+        println!("some data = {:?}", data);
+        println!("{}", "receiving data from server".green());
+        count += 1;
+        println!("count: {}", &count);
+    }
+
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut client1 = RoombaClient::connect("http://[::1]:10002").await?;
@@ -104,9 +128,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // give some time for service to start
 
+    // tokio::spawn(async move {
+    //     match get_sensor_data(&mut client2).await {
+    //         Ok(_) => println!("{}", "get sensor data: OK!".green()),
+    //         Err(e) => eprintln!("Something went wrong: {:?}", e),
+    //     }
+    // });
+
     tokio::spawn(async move {
-        match get_sensor_data(&mut client2).await {
-            Ok(_) => println!("{}", "get sensor data: OK!".green()),
+        match get_odometry_raw(&mut client2).await {
+            Ok(_) => println!("{}", "get odometry raw: OK!".green()),
             Err(e) => eprintln!("Something went wrong: {:?}", e),
         }
     });

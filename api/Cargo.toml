@@ -8,6 +8,8 @@ edition = "2018"
 [dependencies]
 drivers = { path = "../drivers"}
 proto = { path = "../proto"}
+autonomy = { path = "../autonomy"}
+
 serialport = "4.0.0"
 # grpc
 tonic = "0.4"

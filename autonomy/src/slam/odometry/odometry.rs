@@ -33,13 +33,13 @@ pub struct OdometryStamped {
     requested_right_vel: u8,
 
     // ticks
-    prev_ticks_left: u16,
-    prev_ticks_right: u16,
+    prev_ticks_left: u32,
+    prev_ticks_right: u32,
 }
 
 impl OdometryStamped {
     // @classmethod
-    pub fn init(init_left_ticks: u16, init_right_ticks: u16) -> OdometryStamped {
+    pub fn init(init_left_ticks: u32, init_right_ticks: u32) -> OdometryStamped {
         OdometryStamped {
             timer: Timer::init_time(),
             pose: PoseWithCovariance {
@@ -63,7 +63,7 @@ impl OdometryStamped {
         }
     }
 
-    pub fn wrap_encoders(&mut self, curr_ticks_left: u16, curr_ticks_right: u16) -> (i32, i32) {
+    pub fn wrap_encoders(&mut self, curr_ticks_left: u32, curr_ticks_right: u32) -> (i32, i32) {
         const MAX: i32 = Roomba::MAX_ENCODER_TICKS as i32;
         const MAX_95: i32 = (0.95 * (MAX as f32)) as i32;
         const MIN_05: i32 = (0.05 * (MAX as f32)) as i32;
@@ -86,7 +86,7 @@ impl OdometryStamped {
         (delta_ticks_left, delta_ticks_right)
     }
 
-    pub fn compute_odom(&mut self, curr_ticks_left: u16, curr_ticks_right: u16) -> Odometry {
+    pub fn compute_odom(&mut self, curr_ticks_left: u32, curr_ticks_right: u32) -> Odometry {
         // update timestamp
         let dt = self.timer.get_dt();
 
