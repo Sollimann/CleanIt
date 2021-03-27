@@ -17,7 +17,7 @@ use tonic::{Request, Response, Status};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // defining address for our service
-    let addr = "[::1]:10001".parse().unwrap();
+    let addr = "[::1]:10002".parse().unwrap();
     println!("{:?}", addr);
 
     // creating a service

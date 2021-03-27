@@ -72,7 +72,7 @@ pub async fn get_sensor_data(client: &mut RoombaClient<Channel>) -> Result<(), B
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client1 = RoombaClient::connect("http://[::1]:10001").await?;
+    let mut client1 = RoombaClient::connect("http://[::1]:10002").await?;
     // let mut client2 = RoombaClient::connect("http://[::1]:10006").await?;
     let mut client2 = client1.clone();
 
