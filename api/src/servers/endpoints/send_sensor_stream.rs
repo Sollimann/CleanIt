@@ -8,11 +8,6 @@ use tonic::{Request, Response, Status};
 
 // get standard library utils
 use crate::servers::endpoints::RoombaService;
-use colored::Colorize;
-use drivers::roomba::startup::shutdown;
-use std::marker::Sync;
-use std::pin::Pin;
-use std::sync::{Arc, Mutex};
 
 impl RoombaService {
     pub async fn handle_send_sensor_stream(

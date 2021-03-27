@@ -2,9 +2,28 @@
 syntax = "proto3";
 package roomba_service;
 
-import "google/protobuf/timestamp.proto";
-// Package name for the buffer will be used later
-import "types.proto";
+message SensorsReceived {
+  bool status = 1;
+  uint64 packet_count = 2;
+}
+
+message SensorsRequest {
+  uint32 stream_frequency = 1;
+}
+
+message Stasis {
+  uint32 toggling = 1;
+  uint32 disabled = 2;
+}
+
+message LightBumper {
+  bool bumper_left = 1;
+  bool bumper_front_left = 2;
+  bool bumper_center_left = 3;
+  bool bumper_center_right = 4;
+  bool bumper_front_right = 5;
+  bool bumper_right = 6;
+}
 
 message SensorData {
   bool virtual_wall = 1;
@@ -22,13 +41,4 @@ message SensorData {
   uint32 right_encoder_counts = 13;
   LightBumper light_bumper = 14;
   Stasis stasis = 15;
-}
-
-message SensorsReceived {
-  bool status = 1;
-  uint64 packet_count = 2;
-}
-
-message SensorsRequest {
-  uint32 stream_frequency= 1;
 }

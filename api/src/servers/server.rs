@@ -1,7 +1,6 @@
 // get custom protos
 use proto::roomba_service_protos as protos;
-use protos::roomba_server::{Roomba, RoombaServer};
-use protos::{LightBumper, SensorData, SensorsReceived, SensorsRequest, Stasis};
+use protos::roomba_server::RoombaServer;
 
 // standard lib (threading, time, mutex, hashing)
 // use api::servers::facade::RoombaService;
@@ -18,7 +17,7 @@ use tonic::{Request, Response, Status};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // defining address for our service
-    let addr = "[::1]:10001".parse().unwrap();
+    let addr = "[::1]:10002".parse().unwrap();
     println!("{:?}", addr);
 
     // creating a service

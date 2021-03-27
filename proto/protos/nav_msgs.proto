@@ -1,0 +1,31 @@
+// Version of protocol buffer used
+syntax = "proto3";
+
+import "google/protobuf/duration.proto";
+
+package roomba_service;
+// Package name for the buffer will be used later
+
+message OdometryRequest {
+  uint32 stream_frequency = 1;
+}
+
+message Pose {
+  double x = 1;
+  double y = 2;
+  double yaw = 3;
+  repeated double covariance = 4;
+}
+
+message Twist {
+  double x = 1;
+  double y = 2;
+  double yaw = 3;
+  repeated double covariance = 4;
+}
+
+message Odometry {
+  google.protobuf.Duration timestamp = 1;
+  Pose pose = 2;
+  Twist vel = 3;
+}

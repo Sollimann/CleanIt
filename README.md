@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <img src="https://github.com/Sollimann/CleanIt/blob/main/docs/roomba.gif">
+  <img src="https://github.com/Sollimann/CleanIt/blob/main/resources/gifs/roomba.gif">
 </p>
 
 ## Motivation

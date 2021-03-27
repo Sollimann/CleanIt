@@ -1,8 +1,8 @@
 // Version of protocol buffer used
 syntax = "proto3";
 package roomba_service;
-import "messages.proto";
-import "types.proto";
+import "nav_msgs.proto";
+import "sensor_msgs.proto";
 
 // interface exported by the server
 service Roomba {
@@ -15,9 +15,11 @@ service Roomba {
 
   // A server-to-client streaming RPC.
   //
-  // Obtains the Features available within the given Rectangle.  Results are
-  // streamed rather than returned at once (e.g. in a response message with a
-  // repeated field), as the rectangle may cover a large area and contain a
-  // huge number of features.
+  // Stream roomba sensor data from the server
   rpc GetSensorData(SensorsRequest) returns (stream SensorData);
+
+  // A server-to-client streaming RPC.
+  //
+  // Stream roomba sensor data from the server
+  rpc GetOdometryRaw(OdometryRequest) returns (stream Odometry);
 }
