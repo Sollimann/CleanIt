@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 extern crate nalgebra as na;
-use crate::slam::odometry::model::{PoseWithCovariance, Roomba, TwistWithCovariance};
+// use autonomy::model::model::Roomba;
 use crate::utils::constants::Constants;
 use crate::utils::matrix::{
     covar_to_matrix3, mat_multiply_3x2_2x2_2x3, mat_multiply_3x3_3x3_3x3, matrix3_to_covar,
@@ -11,9 +11,27 @@ use na::{Matrix2, Matrix3, Matrix3x2, RowVector2, RowVector3, Vector3};
 use std::f64::consts::PI;
 
 // get custom protos
+use crate::motion::Roomba;
 use prost_types::Duration;
 use proto::roomba_service_protos as protos;
 use protos::{Odometry, Pose, Twist};
+// use autonomy::model::model::Roomba;
+
+#[derive(Debug, Clone)] // needed for printing the object
+pub struct PoseWithCovariance {
+    pub x: f64,
+    pub y: f64,
+    pub yaw: f64,
+    pub covariance: [f64; 9], // 3x3 matrix represented as an array
+}
+
+#[derive(Debug, Clone)]
+pub struct TwistWithCovariance {
+    pub x: f64,
+    pub y: f64,
+    pub yaw: f64,
+    pub covariance: [f64; 9], // 3x3 matrix represented as an array
+}
 
 #[derive(Debug, Clone)]
 pub struct OdometryStamped {

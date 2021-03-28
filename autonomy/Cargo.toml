@@ -9,8 +9,10 @@ edition = "2018"
 [dependencies]
 #api = { path = "../api"}
 proto = { path = "../proto"}
+drivers = {path = "../drivers"}
 nalgebra = "0.24.1"
 futures-util = "0.3.12"
+serialport = "4.0.0"
 
 # Required for wellknown types
 prost-types = "0.7"
