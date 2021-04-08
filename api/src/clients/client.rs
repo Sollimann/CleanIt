@@ -22,6 +22,7 @@ use futures_util::pin_mut;
 use futures_util::stream::StreamExt;
 
 // get standard library utils
+use autonomy::motion::drive::drive;
 use colored::Colorize;
 use drivers::roomba::drive::drive_direct;
 use drivers::roomba::startup::{shutdown, startup};
@@ -145,9 +146,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // give some time for service to start
     thread::sleep(Duration::from_millis(1500));
 
-    port = drive_direct(35, 35, port);
+    // port = drive_direct(50, 50, port);
+    port = drive(0.15, -0.0, port);
     thread::sleep(Duration::from_millis(5000));
-    port = drive_direct(0, 0, port);
+    // port = drive_direct(0, 0, port);
+    port = drive(0.0, 0.0, port);
     thread::sleep(Duration::from_millis(1000));
     shutdown(port);
 
