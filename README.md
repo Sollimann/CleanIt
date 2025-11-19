@@ -22,6 +22,8 @@
 
 Motivation is to build a complete DIY autonomy software from scratch (motion planning, guidance and motion control, SLAM, mission control, 2D/3D visualization etc..) with a real-time client-server communication stream using async gRPC for intercommunication and distributed compute.
 
+The SLAM part is work-in-progress here: https://github.com/Sollimann/Occupancy-Grid-FastSLAM/tree/main
+
 ## Contributions are welcome!
 
 Would you like to contribute with work and/or ideas, feel free to check out the [Project Backlog](https://github.com/Sollimann/CleanIt/projects)
