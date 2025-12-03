@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=Sollimann&project=CleanIt&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 <h1 align="center">CleanIt</h1>
 
 [![Build Status](https://github.com/Sollimann/CleanIt/actions/workflows/rust-ci.yml/badge.svg)](https://github.com/Sollimann/CleanIt/actions)
